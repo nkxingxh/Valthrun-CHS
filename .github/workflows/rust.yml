@@ -29,6 +29,11 @@ jobs:
     # Right now there are no tests specified
     # - name: Run tests
     #   run: cargo test --verbose
+    - name: Upload
+      uses: actions/upload-artifact@v3
+      with:
+        name: controller.exe
+        path: controller_*.exe
     # - name: Upload release build to Discord
     #   run: .github/workflows/discord_upload.sh
     #   shell: bash
