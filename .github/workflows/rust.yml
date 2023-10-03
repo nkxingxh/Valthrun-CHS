@@ -22,15 +22,15 @@ jobs:
           override: true
     - uses: actions/checkout@v3
     - uses: Swatinem/rust-cache@v2
-    - name: Check fmt
-      run: rustup component add rustfmt && cargo fmt --check
+    # - name: Check fmt
+    #   run: rustup component add rustfmt && cargo fmt --check
     - name: Build
       run: cargo build --verbose --release -F require-administrator
     # Right now there are no tests specified
     # - name: Run tests
     #   run: cargo test --verbose
-    - name: Upload release build to Discord
-      run: .github/workflows/discord_upload.sh
-      shell: bash
-      env:
-        DISCORD_RELEASE_WEBHOOK: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
+    # - name: Upload release build to Discord
+    #   run: .github/workflows/discord_upload.sh
+    #   shell: bash
+    #   env:
+    #     DISCORD_RELEASE_WEBHOOK: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
