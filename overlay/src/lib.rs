@@ -95,7 +95,7 @@ pub fn init(title: &str, target_window: &str) -> Result<System> {
         0xFF00, 0xFFEF, // Half-width characters
         0x4e00, 0x9FAF, // CJK Ideograms
         0,              // this 0 is required to close the ranges list
-    ])
+    ]);
 
     // Fixed font size. Note imgui_winit_support uses "logical
     // pixels", which are physical pixels scaled by the devices
