@@ -175,7 +175,7 @@ impl Enhancement for BombInfo {
                 defuse,
             } => {
                 ui.text(&format!(
-                    "Bomb planted on {}",
+                    "炸弹安放在 {}",
                     if *bomb_site == 0 { "A" } else { "B" }
                 ));
                 ui.text(&format!("Damage:"));
@@ -192,19 +192,19 @@ impl Enhancement for BombInfo {
                     ui.text_colored(
                         color,
                         &format!(
-                            "Defused in {:.3} by {}",
-                            defuse.time_remaining, defuse.player_name
+                            "{} 正在拆除... 需要 {:.3} 秒",
+                            defuse.player_name, defuse.time_remaining
                         ),
                     );
                 } else {
-                    ui.text("Not defusing");
+                    ui.text("未拆除");
                 }
             }
             BombState::Defused => {
-                ui.text("Bomb has been defused");
+                ui.text("炸弹已拆除");
             }
             BombState::Detonated => {
-                ui.text("Bomb has been detonated");
+                ui.text("炸了");
             }
         }
 
