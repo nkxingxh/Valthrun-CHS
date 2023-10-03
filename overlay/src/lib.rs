@@ -86,6 +86,17 @@ pub fn init(title: &str, target_window: &str) -> Result<System> {
         platform.attach_window(imgui.io_mut(), window, HiDpiMode::Default);
     }
 
+    let font_range = FontGlyphRange::from_slice(&[
+        0x0020, 0x00FF, // Basic Latin + Latin Supplement
+        0x2010, 0x205E, // Punctuations
+        0x0E00, 0x0E7F, // Thai
+        0x3000, 0x30FF, // Punctuations, Hiragana, Katakana
+        0x31F0, 0x31FF, // Katakana Phonetic Extensions
+        0xFF00, 0xFFEF, // Half-width characters
+        0x4e00, 0x9FAF, // CJK Ideograms
+        0,              // this 0 is required to close the ranges list
+    ])
+
     // Fixed font size. Note imgui_winit_support uses "logical
     // pixels", which are physical pixels scaled by the devices
     // scaling factor. Meaning, 13.0 pixels should look the same size
@@ -97,6 +108,7 @@ pub fn init(title: &str, target_window: &str) -> Result<System> {
         data: include_bytes!("../resources/SourceHanSerifCN-VF.ttf"),
         size_pixels: font_size,
         config: Some(FontConfig {
+            glyph_ranges: font_range,
             // As imgui-glium-renderer isn't gamma-correct with
             // it's font rendering, we apply an arbitrary
             // multiplier to make the font a bit "heavier". With

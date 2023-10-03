@@ -116,7 +116,7 @@ impl SettingsUI {
     }
 
     pub fn render(&mut self, app: &Application, ui: &imgui::Ui) {
-        ui.window(obfstr!("Valthrun"))
+        ui.window(obfstr!("Valthrun-CHS"))
             .size([600.0, 300.0], Condition::FirstUseEver)
             .build(|| {
                 let mut settings = self.settings.borrow_mut();

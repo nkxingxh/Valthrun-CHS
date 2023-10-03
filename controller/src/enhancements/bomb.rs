@@ -181,7 +181,7 @@ impl Enhancement for BombInfo {
                 ui.text(&format!("Damage:"));
                 ui.same_line();
                 ui.text_colored([0.0, 0.0, 0.0, 0.0], "???");
-                ui.text(&format!("Time: {:.3}", time_detonation));
+                ui.text(&format!("倒计时: {:.3}", time_detonation));
                 if let Some(defuse) = defuse.as_ref() {
                     let color = if defuse.time_remaining > *time_detonation {
                         [0.79, 0.11, 0.11, 1.0]
