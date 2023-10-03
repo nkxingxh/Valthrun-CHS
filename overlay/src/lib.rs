@@ -7,7 +7,7 @@ use glium::glutin::event_loop::{ControlFlow, EventLoop};
 use glium::glutin::platform::windows::WindowExtWindows;
 use glium::glutin::window::{Window, WindowBuilder};
 use glium::{Display, Surface};
-use imgui::{Context, FontConfig, FontSource, Io};
+use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Io};
 use imgui_glium_renderer::Renderer;
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use input::{KeyboardInputSystem, MouseInputSystem};
@@ -86,16 +86,16 @@ pub fn init(title: &str, target_window: &str) -> Result<System> {
         platform.attach_window(imgui.io_mut(), window, HiDpiMode::Default);
     }
 
-    let font_range = FontGlyphRange::from_slice(&[
-        0x0020, 0x00FF, // Basic Latin + Latin Supplement
-        0x2010, 0x205E, // Punctuations
-        0x0E00, 0x0E7F, // Thai
-        0x3000, 0x30FF, // Punctuations, Hiragana, Katakana
-        0x31F0, 0x31FF, // Katakana Phonetic Extensions
-        0xFF00, 0xFFEF, // Half-width characters
-        0x4e00, 0x9FAF, // CJK Ideograms
-        0,              // this 0 is required to close the ranges list
-    ]);
+    // let font_range = FontGlyphRanges::from_slice(&[
+    //     0x0020, 0x00FF, // Basic Latin + Latin Supplement
+    //     0x2010, 0x205E, // Punctuations
+    //     0x0E00, 0x0E7F, // Thai
+    //     0x3000, 0x30FF, // Punctuations, Hiragana, Katakana
+    //     0x31F0, 0x31FF, // Katakana Phonetic Extensions
+    //     0xFF00, 0xFFEF, // Half-width characters
+    //     0x4e00, 0x9FAF, // CJK Ideograms
+    //     0,              // this 0 is required to close the ranges list
+    // ]);
 
     // Fixed font size. Note imgui_winit_support uses "logical
     // pixels", which are physical pixels scaled by the devices
@@ -108,7 +108,7 @@ pub fn init(title: &str, target_window: &str) -> Result<System> {
         data: include_bytes!("../resources/SourceHanSerifCN-VF.ttf"),
         size_pixels: font_size,
         config: Some(FontConfig {
-            glyph_ranges: font_range,
+            glyph_ranges: FontGlyphRanges::chinese_simplified_common(),
             // As imgui-glium-renderer isn't gamma-correct with
             // it's font rendering, we apply an arbitrary
             // multiplier to make the font a bit "heavier". With
@@ -205,7 +205,7 @@ impl OverlayActiveTracker {
                 style |= (WS_EX_NOACTIVATE | WS_EX_TRANSPARENT).0 as isize;
             }
 
-            log::trace!("Set UI active: {window_active}");
+            log::trace!("设置 UI 为活动状态: {window_active}");
             SetWindowLongPtrA(hwnd, GWL_EXSTYLE, style);
             if window_active {
                 SetActiveWindow(hwnd);
@@ -264,7 +264,7 @@ impl System {
 
                 let window = gl_window.window();
                 if !runtime_controller.update_state(window) {
-                    log::info!("Target window has been closed. Exiting overlay.");
+                    log::info!("目标窗口已关闭。正在退出叠加层...");
                     *control_flow = ControlFlow::Exit;
                     return;
                 }
@@ -338,7 +338,7 @@ impl SystemRuntimeController {
         self.key_input_system.update(window, self.imgui.io_mut());
         self.active_tracker.update(window, self.imgui.io());
         if !self.window_tracker.update(window) {
-            log::info!("Target window has been closed. Exiting overlay.");
+            log::info!("目标窗口已关闭。正在退出叠加层...");
             return false;
         }
 

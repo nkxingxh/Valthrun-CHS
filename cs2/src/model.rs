@@ -72,7 +72,7 @@ impl CS2Model {
             );
         }
 
-        log::trace!("Reading {} bones", bone_count);
+        log::trace!("正在读取 {} 种骨骼...", bone_count);
         let model_bone_flags = cs2
             .reference_schema::<Ptr<[u32]>>(
                 &[address + offsets_manual::client::CModel::BONE_FLAGS],
