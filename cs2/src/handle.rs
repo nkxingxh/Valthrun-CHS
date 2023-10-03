@@ -80,18 +80,18 @@ impl CS2Handle {
         };
 
         log::debug!(
-            "{}. Process id {}",
-            obfstr!("Successfully initialized CS2 handle"),
+            "成功 {}。进程 ID 为 {}",
+            obfstr!("初始化 CS2 句柄"),
             module_info.process_id
         );
         log::debug!(
-            "  {} located at {:X} ({:X} bytes)",
+            "  {} 位于 {:X} ({:X} 字节)",
             obfstr!("client.dll"),
             module_info.client.base_address,
             module_info.client.module_size
         );
         log::debug!(
-            "  {} located at {:X} ({:X} bytes)",
+            "  {} 位于 {:X} ({:X} 字节)",
             obfstr!("engine2.dll"),
             module_info.engine.base_address,
             module_info.engine.module_size
@@ -143,7 +143,7 @@ impl CS2Handle {
     pub fn memory_address(&self, module: Module, offset: u64) -> anyhow::Result<u64> {
         Ok(module
             .get_base_offset(&self.module_info)
-            .context("invalid module")?
+            .context("无效模块")?
             .base_address as u64
             + offset)
     }
@@ -221,10 +221,10 @@ impl CS2Handle {
     }
 
     pub fn resolve_signature(&self, module: Module, signature: &Signature) -> anyhow::Result<u64> {
-        log::trace!("Resolving '{}' in {:?}", signature.debug_name, module);
+        log::trace!("正在解决 {:?} 中的 '{}'", module, signature.debug_name);
         let module_info = module
             .get_base_offset(&self.module_info)
-            .context("invalid module")?;
+            .context("无效模块")?;
 
         let inst_offset = self
             .ke_interface

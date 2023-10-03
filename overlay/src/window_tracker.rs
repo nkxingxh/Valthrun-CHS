@@ -74,7 +74,7 @@ impl WindowTracker {
         }
 
         self.current_bounds = rect;
-        log::debug!("Window bounds changed: {:?}", rect);
+        log::debug!("窗口边界发生变化: {:?}", rect);
         unsafe {
             let overlay_hwnd = HWND(overlay.hwnd());
             MoveWindow(

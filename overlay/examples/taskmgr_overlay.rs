@@ -4,7 +4,7 @@ fn main() -> anyhow::Result<()> {
         .parse_default_env()
         .init();
 
-    log::info!("Initialize overlay");
+    log::info!("初始化叠加层");
     let overlay = overlay::init("Task Manager Overlay", "Task Manager")?;
     let mut text_input = Default::default();
     overlay.main_loop(

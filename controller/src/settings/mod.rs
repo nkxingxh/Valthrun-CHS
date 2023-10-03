@@ -126,28 +126,28 @@ pub fn load_app_settings() -> anyhow::Result<AppSettings> {
     let config_path = get_settings_path()?;
     if !config_path.is_file() {
         log::info!(
-            "App config file {} does not exist.",
+            "应用程序配置文件 {} 不存在。",
             config_path.to_string_lossy()
         );
-        log::info!("Using default config.");
+        log::info!("使用默认配置。");
         let config: AppSettings =
-            serde_yaml::from_str("").context("failed to parse empty config")?;
+            serde_yaml::from_str("").context("无法解析空配置")?;
 
         return Ok(config);
     }
 
     let config = File::open(&config_path).with_context(|| {
         format!(
-            "failed to open app config at {}",
+            "打开位于 {} 的配置文件失败",
             config_path.to_string_lossy()
         )
     })?;
     let mut config = BufReader::new(config);
 
     let config: AppSettings =
-        serde_yaml::from_reader(&mut config).context("failed to parse app config")?;
+        serde_yaml::from_reader(&mut config).context("无法解析应用程序配置")?;
 
-    log::info!("Loaded app config from {}", config_path.to_string_lossy());
+    log::info!("已从 {} 加载配置文件", config_path.to_string_lossy());
     Ok(config)
 }
 
@@ -160,14 +160,14 @@ pub fn save_app_settings(settings: &AppSettings) -> anyhow::Result<()> {
         .open(&config_path)
         .with_context(|| {
             format!(
-                "failed to open app config at {}",
+                "打开位于 {} 的配置文件失败",
                 config_path.to_string_lossy()
             )
         })?;
     let mut config = BufWriter::new(config);
 
-    serde_yaml::to_writer(&mut config, settings).context("failed to serialize config")?;
+    serde_yaml::to_writer(&mut config, settings).context("配置序列化失败")?;
 
-    log::debug!("Saved app config.");
+    log::debug!("已保存应用程序配置。");
     Ok(())
 }
