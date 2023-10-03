@@ -150,7 +150,7 @@ impl SettingsUI {
 
                         if show_copied {
                             ui.same_line();
-                            ui.text("(Copied)");
+                            ui.text("(已复制)");
                         }
                     }
 
@@ -204,12 +204,12 @@ impl SettingsUI {
                         }
                     }
 
-                    if let Some(_) = ui.tab_item("Aim Assist") {
-                        ui.button_key_optional("Trigger Bot", &mut settings.key_trigger_bot, [150.0, 0.0]);
+                    if let Some(_) = ui.tab_item("辅助瞄准") {
+                        ui.button_key_optional("自动开火", &mut settings.key_trigger_bot, [150.0, 0.0]);
                         if settings.key_trigger_bot.is_some() {
                             let mut values_updated = false;
 
-                            ui.text("Trigger delay: "); ui.same_line();
+                            ui.text("开火延迟: "); ui.same_line();
 
                             let slider_width = (ui.current_column_width() / 2.0 - 20.0).min(300.0).max(50.0);
                             ui.set_next_item_width(slider_width);
@@ -227,8 +227,8 @@ impl SettingsUI {
                                 settings.trigger_bot_delay_max = delay_max;
                             }
 
-                            ui.checkbox("Retest trigger target after delay", &mut settings.trigger_bot_check_target_after_delay);
-                            ui.checkbox("Team Check", &mut settings.trigger_bot_team_check);
+                            ui.checkbox("延迟后重新测试触发目标", &mut settings.trigger_bot_check_target_after_delay);
+                            ui.checkbox("不打友军", &mut settings.trigger_bot_team_check);
                             ui.separator();
                         }
 
