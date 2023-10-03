@@ -94,7 +94,7 @@ pub fn init(title: &str, target_window: &str) -> Result<System> {
     let font_size = 18.0;
 
     imgui.fonts().add_font(&[FontSource::TtfData {
-        data: include_bytes!("../resources/Roboto-Regular.ttf"),
+        data: include_bytes!("../resources/SourceHanSerifCN-VF.ttf"),
         size_pixels: font_size,
         config: Some(FontConfig {
             // As imgui-glium-renderer isn't gamma-correct with
