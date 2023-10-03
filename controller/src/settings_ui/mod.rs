@@ -121,16 +121,19 @@ impl SettingsUI {
             .build(|| {
                 let mut settings = self.settings.borrow_mut();
                 if let Some(_tab_bar) = ui.tab_bar("main") {
-                    if let Some(_tab) = ui.tab_item("Information") {
-                        ui.text(obfstr!("Valthrun an open source CS2 external read only kernel gameplay enhancer."));
-                        ui.text(&format!("{} Version {}", obfstr!("Valthrun"), VERSION));
-                        ui.text(&format!("{} Version {} ({})", obfstr!("CS2"), app.cs2_build_info.revision, app.cs2_build_info.build_datetime));
+                    if let Some(_tab) = ui.tab_item("信息") {
+                        ui.text(obfstr!("Valthrun 是一个开源的 CS2 外部只读内核游戏增强器。"));
+                        ui.text(&format!("{} 版本 {}", obfstr!("Valthrun"), VERSION));
+                        ui.text(&format!("{} 版本 {} ({})", obfstr!("CS2"), app.cs2_build_info.revision, app.cs2_build_info.build_datetime));
+                        ui.text(" ");
+                        ui.text(obfstr!("由 NKXingXh 汉化"));
+                        ui.text(&format!("https://github.com/{}/{}", obfstr!("nkxingxh"), obfstr!("Valthrun-CHS")));
 
                         let ydummy = ui.window_size()[1] - ui.cursor_pos()[1] - ui.text_line_height_with_spacing() * 2.5;
                         ui.dummy([ 0.0, ydummy ]);
                         ui.separator();
 
-                        ui.text("Join our discord:");
+                        ui.text("加入 discord (English):");
                         ui.text_colored([ 0.18, 0.51, 0.97, 1.0 ], obfstr!("https://discord.gg/ecKbpAPW5T"));
                         if ui.is_item_hovered() {
                             ui.set_mouse_cursor(Some(imgui::MouseCursor::Hand));
