@@ -405,7 +405,7 @@ fn main_overlay() -> anyhow::Result<()> {
             .to_string()
     })?;
     log::info!(
-        "已找到 {}. 修订版本 {} 来自 {}.",
+        "已找到 {} 修订版本 {} 来自 {}.",
         obfstr!("Counter-Strike 2"),
         cs2_build_info.revision,
         cs2_build_info.build_datetime
