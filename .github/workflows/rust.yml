@@ -33,7 +33,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: controller.exe
-        path: controller_*.exe
+        path: target/release/controller.exe
     # - name: Upload release build to Discord
     #   run: .github/workflows/discord_upload.sh
     #   shell: bash
