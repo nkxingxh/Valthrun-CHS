@@ -154,24 +154,24 @@ impl SettingsUI {
                         }
                     }
 
-                    if let Some(_) = ui.tab_item("Hotkeys") {
-                        ui.button_key("Toggle Settings", &mut settings.key_settings, [150.0, 0.0]);
-                        ui.button_key_optional("ESP toggle", &mut settings.esp_toogle, [ 150.0, 0.0 ]);
+                    if let Some(_) = ui.tab_item("热键") {
+                        ui.button_key("调出菜单", &mut settings.key_settings, [150.0, 0.0]);
+                        ui.button_key_optional("ESP 开关", &mut settings.esp_toogle, [ 150.0, 0.0 ]);
                     }
 
-                    if let Some(_tab) = ui.tab_item("Visuals") {
+                    if let Some(_tab) = ui.tab_item("视觉") {
                         ui.checkbox(obfstr!("ESP"), &mut settings.esp);
 
                         if settings.esp {
-                            ui.checkbox(obfstr!("ESP Boxes"), &mut settings.esp_boxes);
-                            ui.slider_config("Box Thickness", 0.1, 10.0)
+                            ui.checkbox(obfstr!("ESP 方框"), &mut settings.esp_boxes);
+                            ui.slider_config("方框线宽", 0.1, 10.0)
                                 .build(&mut settings.esp_boxes_thickness);
-                            ui.checkbox(obfstr!("ESP Skeletons"), &mut settings.esp_skeleton);
-                            ui.slider_config("Skeleton Thickness", 0.1, 10.0)
+                            ui.checkbox(obfstr!("ESP 骨架"), &mut settings.esp_skeleton);
+                            ui.slider_config("骨架线宽", 0.1, 10.0)
                                 .build(&mut settings.esp_skeleton_thickness);
-                            ui.checkbox(obfstr!("Display player health"), &mut settings.esp_health);
+                            ui.checkbox(obfstr!("显示玩家生命值"), &mut settings.esp_health);
 
-                            ui.checkbox("ESP Team", &mut settings.esp_enabled_team);
+                            ui.checkbox("ESP 显示我方", &mut settings.esp_enabled_team);
                             if settings.esp_enabled_team {
                                 ui.same_line();
                                 ui.color_edit4_config("Team Color", &mut settings.esp_color_team)
@@ -180,10 +180,10 @@ impl SettingsUI {
                                     .label(false)
                                     .build();
                                 ui.same_line();
-                                ui.text("Team Color");
+                                ui.text("我方颜色");
                             }
 
-                            ui.checkbox("ESP Enemy", &mut settings.esp_enabled_enemy);
+                            ui.checkbox("ESP 显示敌方", &mut settings.esp_enabled_enemy);
                             if settings.esp_enabled_enemy {
                                 ui.same_line();
                                 ui.color_edit4_config("Enemy Color", &mut settings.esp_color_enemy)
@@ -192,14 +192,14 @@ impl SettingsUI {
                                     .label(false)
                                     .build();
                                 ui.same_line();
-                                ui.text("Enemy Color");
+                                ui.text("敌方颜色");
                             }
                             ui.separator();
                         }
 
-                        ui.checkbox(obfstr!("Bomb Timer"), &mut settings.bomb_timer);
+                        ui.checkbox(obfstr!("炸弹计时器"), &mut settings.bomb_timer);
 
-                        if ui.checkbox("Hide overlay from screen capture", &mut settings.hide_overlay_from_screen_capture) {
+                        if ui.checkbox("截图时隐藏叠加层", &mut settings.hide_overlay_from_screen_capture) {
                             app.settings_screen_capture_changed.store(true, Ordering::Relaxed);
                         }
                     }
