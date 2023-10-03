@@ -430,7 +430,7 @@ fn main_overlay() -> anyhow::Result<()> {
             move |model| {
                 let model_name = cs2.read_string(&[*model as u64 + 0x08, 0], Some(32))?;
                 log::debug!(
-                    "{} {} at {:X}. 缓存中...",
+                    "{} {} 位于 {:X}。 缓存中...",
                     obfstr!("发现新的玩家模型"),
                     model_name,
                     model
