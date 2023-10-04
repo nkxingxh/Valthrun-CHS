@@ -23,7 +23,8 @@ fn to_wide_chars(s: &str) -> Vec<u16> {
 use crate::error::{OverlayError, Result};
 use glium::glutin::{platform::windows::WindowExtWindows, window::Window};
 use windows::{
-    core::PCSTR,
+    // core::PCSTR,
+    core::PCWSTR,
     Win32::{
         Foundation::{
             GetLastError, ERROR_INVALID_WINDOW_HANDLE, HWND, LPARAM, POINT, RECT, WPARAM,
@@ -50,7 +51,7 @@ impl WindowTracker {
 
         let cs2_hwnd =
             // unsafe { FindWindowA(PCSTR::null(), PCSTR::from_raw(target.as_ptr() as *const u8)) };
-            unsafe { FindWindowA(PCSTR::null(), PCSTR::from_raw(to_wide_chars(target).as_ptr() as *const u8)) };
+            unsafe { FindWindowW(PCWSTR::null(), PCWSTR::from_raw(to_wide_chars(target).as_ptr())) };
         if cs2_hwnd.0 == 0 {
             return Err(OverlayError::WindowNotFound);
         }
