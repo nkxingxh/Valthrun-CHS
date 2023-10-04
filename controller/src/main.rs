@@ -472,7 +472,11 @@ fn main_overlay() -> anyhow::Result<()> {
     let app = Rc::new(RefCell::new(app));
 
     log::debug!("初始化叠加层");
-    let mut overlay = overlay::init(obfstr!("CS2 Overlay"), obfstr!("Counter-Strike 2"))?;
+    //适配 反恐精英：全球攻势
+    let mut overlay = match overlay::init(obfstr!("C2OL"), obfstr!("Counter-Strike 2")) {
+        Ok(v) => v,
+        Err(e) => overlay::init(obfstr!("C2OL"), obfstr!("反恐精英：全球攻势"))?
+    };
     if let Some(imgui_settings) = imgui_settings {
         overlay.imgui.load_ini_settings(&imgui_settings);
     }

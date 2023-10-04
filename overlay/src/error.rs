@@ -14,7 +14,7 @@ pub enum OverlayError {
     #[error("invalid window name ({0})")]
     WindowInvalidName(NulError),
 
-    #[error("the target window could not be found")]
+    #[error("无法找到目标窗口")]
     WindowNotFound,
 
     #[error("{0}")]
