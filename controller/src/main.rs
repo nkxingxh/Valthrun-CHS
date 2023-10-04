@@ -477,7 +477,7 @@ fn main_overlay() -> anyhow::Result<()> {
         Ok(v) => v,
         Err(_e) => match overlay::init(obfstr!("C2OL"), obfstr!("反恐精英：全球攻势")) {
             Ok(v) => v,
-            Err(_e) => return _e
+            Err(_e) => return Err(_e)
         }
     };
     if let Some(imgui_settings) = imgui_settings {
