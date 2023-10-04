@@ -26,8 +26,8 @@ pub struct WindowTracker {
 impl WindowTracker {
     pub fn new(target: &str) -> Result<Self> {
         let target = CString::new(target).map_err(OverlayError::WindowInvalidName)?;
-        
-        log::info!("正在寻找窗口: {}", target);
+
+        log::info!("正在寻找窗口: {:?}", target);
         let cs2_hwnd =
             unsafe { FindWindowA(PCSTR::null(), PCSTR::from_raw(target.as_ptr() as *const u8)) };
         if cs2_hwnd.0 == 0 {
