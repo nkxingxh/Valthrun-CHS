@@ -50,7 +50,7 @@ impl WindowTracker {
 
         let cs2_hwnd =
             // unsafe { FindWindowA(PCSTR::null(), PCSTR::from_raw(target.as_ptr() as *const u8)) };
-            unsafe { FindWindowA(PCSTR::null(), to_wide_chars(target).as_ptr()) };
+            unsafe { FindWindowA(PCSTR::null(), PCSTR::from_raw(to_wide_chars(target).as_ptr() as *const u8)) };
         if cs2_hwnd.0 == 0 {
             return Err(OverlayError::WindowNotFound);
         }
