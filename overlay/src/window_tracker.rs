@@ -32,7 +32,7 @@ use windows::{
         Graphics::Gdi::ClientToScreen,
         UI::{
             Input::KeyboardAndMouse::GetFocus,
-            WindowsAndMessaging::{FindWindowA, GetClientRect, MoveWindow, SendMessageA, WM_PAINT},
+            WindowsAndMessaging::{/* FindWindowA, */ FindWindowW, GetClientRect, MoveWindow, SendMessageA, WM_PAINT},
         },
     },
 };
