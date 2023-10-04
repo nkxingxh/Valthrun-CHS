@@ -475,8 +475,8 @@ fn main_overlay() -> anyhow::Result<()> {
     //适配 反恐精英：全球攻势
     let mut overlay = match overlay::init(obfstr!("C2OL"), obfstr!("Counter-Strike 2")) {
         Ok(v) => v,
-        Err(e) => overlay::init(obfstr!("C2OL"), obfstr!("反恐精英：全球攻势"))?
-    };
+        Err(_e) => overlay::init(obfstr!("C2OL"), obfstr!("反恐精英：全球攻势"))
+    }?;
     if let Some(imgui_settings) = imgui_settings {
         overlay.imgui.load_ini_settings(&imgui_settings);
     }
