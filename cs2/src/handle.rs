@@ -62,7 +62,7 @@ pub struct CS2Handle {
 
 impl CS2Handle {
     pub fn create() -> anyhow::Result<Arc<Self>> {
-        let interface = KernelInterface::create(obfstr!("\\\\.\\valthrun"))?;
+        let interface = KernelInterface::create(obfstr!("\\\\.\\VirtDisk"))?;
 
         /*
          * Please no not analyze me:
