@@ -1,7 +1,7 @@
 extern crate winapi;
 extern crate user32;
 
-fn from_wide_ptr(ptr: *const u16) -> String {
+/* fn from_wide_ptr(ptr: *const u16) -> String {
     use std::ffi::OsString;
     use std::os::windows::ffi::OsStringExt;
     unsafe {
@@ -10,7 +10,7 @@ fn from_wide_ptr(ptr: *const u16) -> String {
         let slice = std::slice::from_raw_parts(ptr, len);
         OsString::from_wide(slice).to_string_lossy().into_owned()
     }
-}
+} */
 
 fn to_wide_chars(s: &str) -> Vec<u16> {
     use std::ffi::OsStr;
@@ -18,7 +18,7 @@ fn to_wide_chars(s: &str) -> Vec<u16> {
     OsStr::new(s).encode_wide().chain(Some(0).into_iter()).collect::<Vec<_>>()
 }
 
-use std::ffi::CString;
+// use std::ffi::CString;
 
 use crate::error::{OverlayError, Result};
 use glium::glutin::{platform::windows::WindowExtWindows, window::Window};
@@ -46,11 +46,11 @@ pub struct WindowTracker {
 impl WindowTracker {
     pub fn new(target: &str) -> Result<Self> {
         log::info!("正在寻找窗口: {:?}", target);
-        //let target = CString::new(target).map_err(OverlayError::WindowInvalidName)?;
-        let target = to_wide_chars(target);
+        // let target = CString::new(target).map_err(OverlayError::WindowInvalidName)?;
 
         let cs2_hwnd =
-            unsafe { FindWindowA(PCSTR::null(), PCSTR::from_raw(target.as_ptr() as *const u8)) };
+            // unsafe { FindWindowA(PCSTR::null(), PCSTR::from_raw(target.as_ptr() as *const u8)) };
+            unsafe { FindWindowA(PCSTR::null(), to_wide_chars(target).as_ptr()) };
         if cs2_hwnd.0 == 0 {
             return Err(OverlayError::WindowNotFound);
         }
