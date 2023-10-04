@@ -5,10 +5,10 @@ use valthrun_driver_shared::IO_MAX_DEREF_COUNT;
 
 #[derive(Error, Debug)]
 pub enum KInterfaceError {
-    #[error("kernel interface path contains invalid characters")]
+    #[error("内核接口路径包含无效字符")]
     DeviceInvalidPath(NulError),
 
-    #[error("kernel interface unavailable: {0}")]
+    #[error("内核接口不可用: {0}")]
     DeviceUnavailable(windows::core::Error),
 
     #[error("request failed (DeviceIoControl)")]
