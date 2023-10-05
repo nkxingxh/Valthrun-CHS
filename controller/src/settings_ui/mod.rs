@@ -199,6 +199,8 @@ impl SettingsUI {
 
                         ui.checkbox(obfstr!("炸弹计时器"), &mut settings.bomb_timer);
 
+                        ui.checkbox(obfstr!("Valthrun 水印"), &mut settings.valthrun_watermark);
+
                         if ui.checkbox("截图时隐藏叠加层", &mut settings.hide_overlay_from_screen_capture) {
                             app.settings_screen_capture_changed.store(true, Ordering::Relaxed);
                         }
