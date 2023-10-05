@@ -5,57 +5,60 @@
 </a>
 </p>
 
-Valthrun an open source external Counter-Strike 2 read only kernel gameplay enhancer.  
-That's a lot of descriptive words, but what does each of them mean?  
-- `Valthrun` The name of this project
-- `Open Source` This application is open source and for everbody to study
-- `external` We do not inject any ddls into the target process
-- `Counter-Strike 2` The game we're enhancing
-- `read only` We do not write to the CS2 process in any way, therefore being impossible to detect by scanning the process memory.
-- `kernel` We do not use any user level WinAPIs in order to get information from the CS2 process
-  
-This project is mainly a fun example for exploring the Windows Kernel with [Rust](https://www.rust-lang.org) and exploring the world of game enhancements :)
+# Valthrun-CHS
+Valthrun 是一个开源的 CS2 外部只读内核游戏增强器。
+Valthrun-CHS 是前者的简体中文汉化版本。
 
-# WARNING
-Valthrun is currently **not** a pnp (plug 'n play) application.  
-Please read [How to use](#how-to-use) carefully and try troubleshooting issues on your own.  
-The goal is to reach maximum stelth to avoid anti cheat detection.  
+这是什么意思？  
+- `Valthrun` 项目名称。
+- `开源` 这个应用程序是开放源代码的，供所有人学习。
+- `外部` 我们不向目标进程注入任何 DLL。
+- `CS2` 我们要增强的游戏。
+- `只读` 我们不会以任何方式写入 CS2 进程，因此无法通过扫描进程内存来检测。
+- `内核` 我们不使用任何用户级 WinAPI 从 CS2 进程获取信息。
+
+该项目主要是利用 [Rust](https://www.rust-lang.org) 探索 Windows 内核和游戏增强功能的一个有趣示例 :)
+
+# 警告
+Valthrun 目前**不是** pnp (即插即用) 的应用程序。 
+请仔细阅读 [如何使用](#如何使用)，并尝试自行排除故障。 
+目的是最大限度地避免反作弊检测。
   
-# Features
-Valthrun provides a variety of external tools to enchant your gameplay experience.  
-As of now, Valthrun only reads memory and never writes anything. This implies some limitations as which features could be provided.  
-An example would be a skin changer which is not be possible without actively modifying the CS2 game state (e.g. writing into it's memory).  
+# 特性
+Valthrun 提供各种外部工具，让您的游戏体验更加精彩。 
+目前，Valthrun 只读取内存，从不写入任何内容。这意味着可提供的功能有一些限制。 
+*例如，如果不主动修改 CS2 游戏状态 (如写入内存) ，就不可能提供皮肤更换器。*
   
-Regardless of this limitation, Valthrun supports the following features:  
-- Player ESP
-  Two modes are supported: `Skeleton` and `Boxes`
-  - Configurable colors to distinguish between enemy and team players
-  - ESP includes player health
-- Bomb Info
-  - Time until the bomb detonation
-  - Defuser info such as how long until the defuse has succeeded
-  - Bomb site where the bomb is located
-- Trigger Bot
+尽管存在这种限制，Valthrun 还是支持以下功能:
+- 玩家 ESP
+  支持两种模式: `骨架` 和 `方框`
+  - 可配置颜色以区分敌我玩家
+  - ESP 包括玩家生命值
+- 炸弹信息
+  - 炸弹倒计时
+  - 拆弹信息，如距离拆弹成功还有多久
+  - 放置炸弹的地点
+- 自动扳机
 - Stream proof by default
 
-To access Valthruns settings overlay press `PAUSE`.
+要打开 Valthruns 菜单，请按 `PAUSE` 键。
 
-## Planned Features
+## 计划功能
 - Aim Bot
 - Spectator info
   - List of player currently watching you / the observer target
 - Player competitive ranks / wins
 
-# Installation
-Valthrun does not need to be installed.  
-In order to run Valthrun you only need the kernel driver (`valthrun-driver.sys`) and the controller (`controller.exe`).  
+# 安装
+Valthrun 不需要安裝。 
+要运行 Valthrun，你只需要内核驱动程序 (`valthrun-driver.sys`) 和控制器 (`controller.exe`)。
   
-Both can be accquired by downloading the precompiled release from GitHub.  
-Click [here](https://github.com/WolverinDEV/Valthrun/releases) to view all releases.
+这两个版本都可以从 GitHub 下载预编译版本。
+点击[这里](https://github.com/WolverinDEV/Valthrun/releases)查看所有发布版本。
   
-Once downloaded read [How to use](#how-to-use) to get started!
+Once downloaded read [How to use](#如何使用) to get started!
 
-# How to use
+# 如何使用
 The following steps need to be done for starting/activating the overlay.
 1. Load the kernel driver  
    The overlay requires the kernel driver for all memory reads and writes.
@@ -116,5 +119,5 @@ If you encounter an issue, please submit an issue containing your Windows versio
 ![](./img/showcase_02.png)
 
 # Help
-You can find help on the official Valthrun Discord server:  
+You can find help on the official Valthrun Discord server:
 [![Discord Shield](https://discordapp.com/api/guilds/1135362291311849693/widget.png?style=shield)](https://discord.gg/ecKbpAPW5T)

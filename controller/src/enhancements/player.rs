@@ -220,7 +220,7 @@ impl Enhancement for PlayerESP {
                 Ok(None) => {}
                 Err(error) => {
                     log::warn!(
-                        "Failed to generate player ESP info for {:X}: {:#}",
+                        "无法为 {:X} 生成玩家 ESP 信息: {:#}",
                         player_controller.address()?,
                         error
                     );

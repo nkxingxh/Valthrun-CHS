@@ -1,7 +1,7 @@
 use ash::vk;
 use clipboard::ClipboardSupport;
 use copypasta::ClipboardContext;
-use imgui::{Context, FontConfig, FontSource, Io};
+use imgui::{Context, FontConfig, FontGlyphRanges, FontSource, Io};
 use imgui_rs_vulkan_renderer::{Options, Renderer};
 use imgui_winit_support::winit::event::{Event, WindowEvent};
 use imgui_winit_support::winit::event_loop::{ControlFlow, EventLoop};
@@ -117,9 +117,10 @@ fn create_imgui_context() -> Result<(WinitPlatform, imgui::Context)> {
     // value (as the scaling is handled by winit)
     let font_size = 18.0;
     imgui.fonts().add_font(&[FontSource::TtfData {
-        data: include_bytes!("../resources/Roboto-Regular.ttf"),
+        data: include_bytes!("../resources/SourceHanSerifCN-VF.ttf"),
         size_pixels: font_size,
         config: Some(FontConfig {
+            glyph_ranges: FontGlyphRanges::chinese_simplified_common(),
             // As imgui-glium-renderer isn't gamma-correct with
             // it's font rendering, we apply an arbitrary
             // multiplier to make the font a bit "heavier". With
@@ -268,7 +269,7 @@ impl OverlayActiveTracker {
                 style |= (WS_EX_NOACTIVATE | WS_EX_TRANSPARENT).0 as isize;
             }
 
-            log::trace!("Set UI active: {window_active}");
+            log::trace!("设置 UI 为活动状态: {window_active}");
             SetWindowLongPtrA(hwnd, GWL_EXSTYLE, style);
             if window_active {
                 SetActiveWindow(hwnd);
@@ -344,7 +345,7 @@ impl System {
                     /* Update */
                     {
                         if !runtime_controller.update_state(&window) {
-                            log::info!("Target window has been closed. Exiting overlay.");
+                            log::info!("目标窗口已关闭。正在退出叠加层...");
                             *control_flow = ControlFlow::Exit;
                             return;
                         }
@@ -547,7 +548,7 @@ impl SystemRuntimeController {
         self.key_input_system.update(window, self.imgui.io_mut());
         self.active_tracker.update(window, self.imgui.io());
         if !self.window_tracker.update(window) {
-            log::info!("Target window has been closed. Exiting overlay.");
+            log::info!("目标窗口已关闭。正在退出叠加层...");
             return false;
         }
 

@@ -122,7 +122,7 @@ impl Application {
             settings.imgui = Some(imgui_settings);
 
             if let Err(error) = save_app_settings(&*settings) {
-                log::warn!("Failed to save user settings: {}", error);
+                log::warn!("保存用户设置失败: {}", error);
             };
         }
 
@@ -133,7 +133,7 @@ impl Application {
             let settings = self.settings.borrow();
             controller.toggle_screen_capture_visibility(!settings.hide_overlay_from_screen_capture);
             log::debug!(
-                "Updating screen capture visibility to {}",
+                "将屏幕截图的可见性更新至 {}",
                 !settings.hide_overlay_from_screen_capture
             );
         }
@@ -224,31 +224,33 @@ impl Application {
     fn render_overlay(&self, ui: &imgui::Ui) {
         let settings = self.settings.borrow();
 
-        {
-            let text_buf;
-            let text = obfstr!(text_buf = "Valthrun Overlay");
+        if settings.valthrun_watermark {
+            {
+                let text_buf;
+                let text = obfstr!(text_buf = "Valthrun 叠加层");
 
-            ui.set_cursor_pos([
-                ui.window_size()[0] - ui.calc_text_size(text)[0] - 10.0,
-                10.0,
-            ]);
-            ui.text(text);
-        }
-        {
-            let text = format!("{:.2} FPS", ui.io().framerate);
-            ui.set_cursor_pos([
-                ui.window_size()[0] - ui.calc_text_size(&text)[0] - 10.0,
-                24.0,
-            ]);
-            ui.text(text)
-        }
-        {
-            let text = format!("{} Reads", self.frame_read_calls);
-            ui.set_cursor_pos([
-                ui.window_size()[0] - ui.calc_text_size(&text)[0] - 10.0,
-                38.0,
-            ]);
-            ui.text(text)
+                ui.set_cursor_pos([
+                    ui.window_size()[0] - ui.calc_text_size(text)[0] - 10.0,
+                    10.0,
+                ]);
+                ui.text(text);
+            }
+            {
+                let text = format!("{:.2} FPS", ui.io().framerate);
+                ui.set_cursor_pos([
+                    ui.window_size()[0] - ui.calc_text_size(&text)[0] - 10.0,
+                    24.0,
+                ]);
+                ui.text(text)
+            }
+            {
+                let text = format!("{} Reads", self.frame_read_calls);
+                ui.set_cursor_pos([
+                    ui.window_size()[0] - ui.calc_text_size(&text)[0] - 10.0,
+                    38.0,
+                ]);
+                ui.text(text)
+            }
         }
 
         for hack in self.enhancements.iter() {
@@ -393,13 +395,13 @@ fn main_overlay() -> anyhow::Result<()> {
                     if !unsafe { IsUserAnAdmin().as_bool() } {
                         if !is_console_invoked() {
                             /* If we don't have a console, show the message box and abort execution. */
-                            show_critical_error("Please re-run this application as administrator!");
+                            show_critical_error("请以管理员身份重新运行此程序！");
                             return Ok(());
                         }
 
                         /* Just print this warning message and return the actual error.  */
-                        log::warn!("Application run without administrator privileges.");
-                        log::warn!("Please re-run with administrator privileges!");
+                        log::warn!("程序运行时无管理员权限。");
+                        log::warn!("请以管理员身份重新运行！");
                     }
 
                     if error.code().0 as u32 == 0x80070002 {
@@ -408,7 +410,7 @@ fn main_overlay() -> anyhow::Result<()> {
                         return Ok(());
                     }
                 } else if let KInterfaceError::ProcessDoesNotExists = &err {
-                    show_critical_error("Could not find CS2 process.\nPlease start CS2 prior to executing this application!");
+                    show_critical_error("无法找到游戏进程。\n请在启动本程序前先启动游戏！");
                     return Ok(());
                 }
             }
@@ -417,11 +419,11 @@ fn main_overlay() -> anyhow::Result<()> {
         }
     };
     let cs2_build_info = BuildInfo::read_build_info(&cs2).with_context(|| {
-        obfstr!("Failed to load CS2 build info. CS2 version might be newer / older then expected")
+        obfstr!("加载 CS2 构建信息失败。CS2 版本可能高于/低于预期")
             .to_string()
     })?;
     log::info!(
-        "Found {}. Revision {} from {}.",
+        "已找到 {} 修订版本 {} 来自 {}.",
         obfstr!("Counter-Strike 2"),
         cs2_build_info.revision,
         cs2_build_info.build_datetime
@@ -429,7 +431,7 @@ fn main_overlay() -> anyhow::Result<()> {
 
     let cs2_offsets = Arc::new(
         CS2Offsets::resolve_offsets(&cs2)
-            .with_context(|| obfstr!("failed to load CS2 offsets").to_string())?,
+            .with_context(|| obfstr!("无法加载 CS2 偏移量").to_string())?,
     );
 
     let imgui_settings = settings.imgui.clone();
@@ -446,8 +448,8 @@ fn main_overlay() -> anyhow::Result<()> {
             move |model| {
                 let model_name = cs2.read_string(&[*model as u64 + 0x08, 0], Some(32))?;
                 log::debug!(
-                    "{} {} at {:X}. Caching.",
-                    obfstr!("Discovered new player model"),
+                    "{} {} 位于 {:X}。 缓存中...",
+                    obfstr!("发现新的玩家模型"),
                     model_name,
                     model
                 );
@@ -488,7 +490,7 @@ fn main_overlay() -> anyhow::Result<()> {
 
     let app = Rc::new(RefCell::new(app));
 
-    log::debug!("Initialize overlay");
+    log::debug!("初始化叠加层");
     // OverlayError
     let mut overlay = match overlay::init(obfstr!("CS2 Overlay"), obfstr!("Counter-Strike 2")) {
         Err(OverlayError::VulkanDllNotFound(LoadingError::LibraryLoadFailure(source))) => {
@@ -514,7 +516,7 @@ fn main_overlay() -> anyhow::Result<()> {
         overlay.imgui.load_ini_settings(&imgui_settings);
     }
 
-    log::info!("{}", obfstr!("App initialized. Spawning overlay."));
+    log::info!("{}", obfstr!("应用程序已初始化。正在准备叠加层..."));
     let mut update_fail_count = 0;
     let mut update_timeout: Option<(Instant, Duration)> = None;
     overlay.main_loop(

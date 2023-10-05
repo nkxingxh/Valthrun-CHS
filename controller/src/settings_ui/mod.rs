@@ -116,21 +116,24 @@ impl SettingsUI {
     }
 
     pub fn render(&mut self, app: &Application, ui: &imgui::Ui) {
-        ui.window(obfstr!("Valthrun"))
+        ui.window(obfstr!("Valthrun-CHS"))
             .size([600.0, 300.0], Condition::FirstUseEver)
             .build(|| {
                 let mut settings = self.settings.borrow_mut();
                 if let Some(_tab_bar) = ui.tab_bar("main") {
-                    if let Some(_tab) = ui.tab_item("Information") {
-                        ui.text(obfstr!("Valthrun an open source CS2 external read only kernel gameplay enhancer."));
-                        ui.text(&format!("{} Version {}", obfstr!("Valthrun"), VERSION));
-                        ui.text(&format!("{} Version {} ({})", obfstr!("CS2"), app.cs2_build_info.revision, app.cs2_build_info.build_datetime));
+                    if let Some(_tab) = ui.tab_item("信息") {
+                        ui.text(obfstr!("Valthrun 是一个开源的 CS2 外部只读内核游戏增强器。"));
+                        ui.text(&format!("{} 版本 {}", obfstr!("Valthrun"), VERSION));
+                        ui.text(&format!("{} 版本 {} ({})", obfstr!("CS2"), app.cs2_build_info.revision, app.cs2_build_info.build_datetime));
+                        ui.text(" ");
+                        ui.text(obfstr!("由 NKXingXh 汉化"));
+                        ui.text(&format!("https://github.com/{}/{}", obfstr!("nkxingxh"), obfstr!("Valthrun-CHS")));
 
                         let ydummy = ui.window_size()[1] - ui.cursor_pos()[1] - ui.text_line_height_with_spacing() * 2.5;
                         ui.dummy([ 0.0, ydummy ]);
                         ui.separator();
 
-                        ui.text("Join our discord:");
+                        ui.text("加入 discord (English):");
                         ui.text_colored([ 0.18, 0.51, 0.97, 1.0 ], obfstr!("https://discord.gg/ecKbpAPW5T"));
                         if ui.is_item_hovered() {
                             ui.set_mouse_cursor(Some(imgui::MouseCursor::Hand));
@@ -147,28 +150,28 @@ impl SettingsUI {
 
                         if show_copied {
                             ui.same_line();
-                            ui.text("(Copied)");
+                            ui.text("(已复制)");
                         }
                     }
 
-                    if let Some(_) = ui.tab_item("Hotkeys") {
-                        ui.button_key("Toggle Settings", &mut settings.key_settings, [150.0, 0.0]);
-                        ui.button_key_optional("ESP toggle", &mut settings.esp_toogle, [ 150.0, 0.0 ]);
+                    if let Some(_) = ui.tab_item("热键") {
+                        ui.button_key("调出菜单", &mut settings.key_settings, [150.0, 0.0]);
+                        ui.button_key_optional("ESP 开关", &mut settings.esp_toogle, [ 150.0, 0.0 ]);
                     }
 
-                    if let Some(_tab) = ui.tab_item("Visuals") {
+                    if let Some(_tab) = ui.tab_item("视觉") {
                         ui.checkbox(obfstr!("ESP"), &mut settings.esp);
 
                         if settings.esp {
-                            ui.checkbox(obfstr!("ESP Boxes"), &mut settings.esp_boxes);
-                            ui.slider_config("Box Thickness", 0.1, 10.0)
+                            ui.checkbox(obfstr!("ESP 方框"), &mut settings.esp_boxes);
+                            ui.slider_config("方框线宽", 0.1, 10.0)
                                 .build(&mut settings.esp_boxes_thickness);
-                            ui.checkbox(obfstr!("ESP Skeletons"), &mut settings.esp_skeleton);
-                            ui.slider_config("Skeleton Thickness", 0.1, 10.0)
+                            ui.checkbox(obfstr!("ESP 骨架"), &mut settings.esp_skeleton);
+                            ui.slider_config("骨架线宽", 0.1, 10.0)
                                 .build(&mut settings.esp_skeleton_thickness);
-                            ui.checkbox(obfstr!("Display player health"), &mut settings.esp_health);
+                            ui.checkbox(obfstr!("显示玩家生命值"), &mut settings.esp_health);
 
-                            ui.checkbox("ESP Team", &mut settings.esp_enabled_team);
+                            ui.checkbox("ESP 显示我方", &mut settings.esp_enabled_team);
                             if settings.esp_enabled_team {
                                 ui.same_line();
                                 ui.color_edit4_config("Team Color", &mut settings.esp_color_team)
@@ -177,10 +180,10 @@ impl SettingsUI {
                                     .label(false)
                                     .build();
                                 ui.same_line();
-                                ui.text("Team Color");
+                                ui.text("我方颜色");
                             }
 
-                            ui.checkbox("ESP Enemy", &mut settings.esp_enabled_enemy);
+                            ui.checkbox("ESP 显示敌方", &mut settings.esp_enabled_enemy);
                             if settings.esp_enabled_enemy {
                                 ui.same_line();
                                 ui.color_edit4_config("Enemy Color", &mut settings.esp_color_enemy)
@@ -189,20 +192,20 @@ impl SettingsUI {
                                     .label(false)
                                     .build();
                                 ui.same_line();
-                                ui.text("Enemy Color");
+                                ui.text("敌方颜色");
                             }
                             ui.separator();
                         }
 
-                        ui.checkbox(obfstr!("Bomb Timer"), &mut settings.bomb_timer);
+                        ui.checkbox(obfstr!("炸弹计时器"), &mut settings.bomb_timer);
                     }
 
-                    if let Some(_) = ui.tab_item("Aim Assist") {
-                        ui.button_key_optional("Trigger Bot", &mut settings.key_trigger_bot, [150.0, 0.0]);
+                    if let Some(_) = ui.tab_item("辅助瞄准") {
+                        ui.button_key_optional("自动开火", &mut settings.key_trigger_bot, [150.0, 0.0]);
                         if settings.key_trigger_bot.is_some() {
                             let mut values_updated = false;
 
-                            ui.text("Trigger delay: "); ui.same_line();
+                            ui.text("开火延迟: "); ui.same_line();
 
                             let slider_width = (ui.current_column_width() / 2.0 - 20.0).min(300.0).max(50.0);
                             ui.set_next_item_width(slider_width);
@@ -220,8 +223,8 @@ impl SettingsUI {
                                 settings.trigger_bot_delay_max = delay_max;
                             }
 
-                            ui.checkbox("Retest trigger target after delay", &mut settings.trigger_bot_check_target_after_delay);
-                            ui.checkbox("Team Check", &mut settings.trigger_bot_team_check);
+                            ui.checkbox("延迟后重新测试触发目标", &mut settings.trigger_bot_check_target_after_delay);
+                            ui.checkbox("不打友军", &mut settings.trigger_bot_team_check);
                             ui.separator();
                         }
 
@@ -230,11 +233,11 @@ impl SettingsUI {
 
 
                     if let Some(_) = ui.tab_item("Misc") {
-                        if ui.checkbox("Hide overlay from screen capture", &mut settings.hide_overlay_from_screen_capture) {
+                        if ui.checkbox("截图时隐藏叠加层", &mut settings.hide_overlay_from_screen_capture) {
                             app.settings_screen_capture_changed.store(true, Ordering::Relaxed);
                         }
 
-                        if ui.checkbox("Show render debug overlay", &mut settings.render_debug_window) {
+                        if ui.checkbox("显示渲染调试叠加层", &mut settings.render_debug_window) {
                             app.settings_render_debug_window_changed.store(true, Ordering::Relaxed);
                         }
                     }
