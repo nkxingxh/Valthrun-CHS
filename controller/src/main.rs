@@ -227,7 +227,7 @@ impl Application {
         if settings.valthrun_watermark {
             {
                 let text_buf;
-                let text = obfstr!(text_buf = "Valthrun 叠加层");
+                let text = obfstr!(text_buf = "Valthrun-CHS 叠加层");
 
                 ui.set_cursor_pos([
                     ui.window_size()[0] - ui.calc_text_size(text)[0] - 10.0,

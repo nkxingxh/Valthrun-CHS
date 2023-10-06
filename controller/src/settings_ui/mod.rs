@@ -232,7 +232,7 @@ impl SettingsUI {
                     }
 
 
-                    if let Some(_) = ui.tab_item("Misc") {
+                    if let Some(_) = ui.tab_item("杂项") {
                         ui.checkbox("Valthrun 水印", &mut settings.valthrun_watermark);
 
                         if ui.checkbox("截图时隐藏叠加层", &mut settings.hide_overlay_from_screen_capture) {

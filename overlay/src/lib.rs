@@ -391,7 +391,7 @@ impl System {
                             return;
                         }
                         if runtime_controller.debug_overlay_shown {
-                            ui.window("Render Debug")
+                            ui.window("渲染调试")
                                 .position([200.0, 200.0], imgui::Condition::FirstUseEver)
                                 .size([400.0, 400.0], imgui::Condition::FirstUseEver)
                                 .build(|| {
