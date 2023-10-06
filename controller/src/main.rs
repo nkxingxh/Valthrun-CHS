@@ -13,11 +13,12 @@ use cs2_schema_declaration::Ptr;
 use enhancements::Enhancement;
 use imgui::{Condition, Ui};
 use obfstr::obfstr;
-use overlay::SystemRuntimeController;
+use overlay::{LoadingError, OverlayError, SystemRuntimeController};
 use settings::{load_app_settings, AppSettings};
 use settings_ui::SettingsUI;
 use std::{
     cell::{RefCell, RefMut},
+    error::Error,
     fmt::Debug,
     fs::File,
     io::BufWriter,
@@ -99,6 +100,7 @@ pub struct Application {
     pub settings_dirty: bool,
     pub settings_ui: RefCell<SettingsUI>,
     pub settings_screen_capture_changed: AtomicBool,
+    pub settings_render_debug_window_changed: AtomicBool,
 }
 
 impl Application {
@@ -134,6 +136,14 @@ impl Application {
                 "将屏幕截图的可见性更新至 {}",
                 !settings.hide_overlay_from_screen_capture
             );
+        }
+
+        if self
+            .settings_render_debug_window_changed
+            .swap(false, Ordering::Relaxed)
+        {
+            let settings = self.settings.borrow();
+            controller.toggle_debug_overlay(settings.render_debug_window);
         }
 
         Ok(())
@@ -389,7 +399,7 @@ fn main_overlay() -> anyhow::Result<()> {
         Ok(handle) => handle,
         Err(err) => {
             if let Some(err) = err.downcast_ref::<KInterfaceError>() {
-                if let KInterfaceError::DeviceUnavailable(_) = &err {
+                if let KInterfaceError::DeviceUnavailable(error) = &err {
                     if !unsafe { IsUserAnAdmin().as_bool() } {
                         if !is_console_invoked() {
                             /* If we don't have a console, show the message box and abort execution. */
@@ -400,6 +410,12 @@ fn main_overlay() -> anyhow::Result<()> {
                         /* Just print this warning message and return the actual error.  */
                         log::warn!("程序运行时无管理员权限。");
                         log::warn!("请以管理员身份重新运行！");
+                    }
+
+                    if error.code().0 as u32 == 0x80070002 {
+                        /* The system cannot find the file specified. */
+                        show_critical_error("无法找到内核驱动程序接口。\n在启动控制器之前，请确保已成功加载或映射内核驱动程序 (valthrun-driver.sys)。\n请明确检查驱动程序入口状态代码，该代码应为 0x0。\n\n如需更多帮助，请查阅: \nhttps://github.com/Valthrun/Valthrun/tree/master/doc/troubleshooting.");
+                        return Ok(());
                     }
                 } else if let KInterfaceError::ProcessDoesNotExists = &err {
                     show_critical_error("无法找到游戏进程。\n请在启动本程序前先启动游戏！");
@@ -477,16 +493,33 @@ fn main_overlay() -> anyhow::Result<()> {
         settings_ui: RefCell::new(SettingsUI::new(settings)),
         /* set the screen capture visibility at the beginning of the first update */
         settings_screen_capture_changed: AtomicBool::new(true),
+        settings_render_debug_window_changed: AtomicBool::new(true),
     };
 
     let app = Rc::new(RefCell::new(app));
 
     log::debug!("初始化叠加层");
-    //适配 反恐精英：全球攻势
-    let mut overlay = match overlay::init(obfstr!("C2OL"), obfstr!("Counter-Strike 2")) {
-        Ok(v) => Ok(v),
-        Err(_e) => overlay::init(obfstr!("C2OL"), obfstr!("\u{53cd}\u{6050}\u{7cbe}\u{82f1}\u{ff1a}\u{5168}\u{7403}\u{653b}\u{52bf}"))
-    }?;
+    // OverlayError
+    let mut overlay = match overlay::init(obfstr!("CS2 Overlay"), obfstr!("Counter-Strike 2")) {
+        Err(OverlayError::VulkanDllNotFound(LoadingError::LibraryLoadFailure(source))) => {
+            match &source {
+                libloading::Error::LoadLibraryExW { .. } => {
+                    let error = source.source().context("LoadLibraryExW to have a source")?;
+                    let message = format!("Failed to load vulkan-1.dll.\nError: {:#}", error);
+                    show_critical_error(&message);
+                }
+                error => {
+                    let message = format!(
+                        "An error occurred while loading vulkan-1.dll.\nError: {:#}",
+                        error
+                    );
+                    show_critical_error(&message);
+                }
+            }
+            return Ok(());
+        }
+        value => value?,
+    };
     if let Some(imgui_settings) = imgui_settings {
         overlay.imgui.load_ini_settings(&imgui_settings);
     }

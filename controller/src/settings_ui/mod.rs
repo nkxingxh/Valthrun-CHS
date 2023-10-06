@@ -198,16 +198,6 @@ impl SettingsUI {
                         }
 
                         ui.checkbox(obfstr!("炸弹计时器"), &mut settings.bomb_timer);
-
-                        ui.checkbox(obfstr!("Valthrun 水印"), &mut settings.valthrun_watermark);
-
-                        if ui.checkbox("截图时隐藏叠加层", &mut settings.hide_overlay_from_screen_capture) {
-                            app.settings_screen_capture_changed.store(true, Ordering::Relaxed);
-                        }
-
-                        // FPS Limit
-                        ui.slider_config("Overlay FPS Limit", 0, 960)
-                            .build(&mut settings.overlay_fps_limit);
                     }
 
                     if let Some(_) = ui.tab_item("辅助瞄准") {
@@ -239,6 +229,19 @@ impl SettingsUI {
                         }
 
                         // ui.checkbox("Simle Recoil Helper", &mut settings.aim_assist_recoil);
+                    }
+
+
+                    if let Some(_) = ui.tab_item("杂项") {
+                        ui.checkbox("Valthrun 水印", &mut settings.valthrun_watermark);
+
+                        if ui.checkbox("截图时隐藏叠加层", &mut settings.hide_overlay_from_screen_capture) {
+                            app.settings_screen_capture_changed.store(true, Ordering::Relaxed);
+                        }
+
+                        if ui.checkbox("显示渲染调试叠加层", &mut settings.render_debug_window) {
+                            app.settings_render_debug_window_changed.store(true, Ordering::Relaxed);
+                        }
                     }
                 }
             });

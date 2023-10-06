@@ -4,11 +4,14 @@ fn main() -> anyhow::Result<()> {
         .parse_default_env()
         .init();
 
-    log::info!("初始化叠加层");
-    let overlay = overlay::init("Task Manager Overlay", "Task Manager")?;
+    log::info!("Initialize overlay");
+    let overlay = overlay::init("Task Manager Overlay", "Counter-Strike 2")?;
     let mut text_input = Default::default();
     overlay.main_loop(
-        |_ctx| true,
+        |controller| {
+            controller.toggle_debug_overlay(true);
+            true
+        },
         move |ui| {
             ui.window("Dummy Window")
                 .resizable(true)

@@ -116,6 +116,9 @@ pub struct AppSettings {
 
     #[serde(default = "default_u32::<0>")]
     pub overlay_fps_limit: u32,
+    
+    #[serde(default = "bool_false")]
+    pub render_debug_window: bool,
 
     #[serde(default)]
     pub imgui: Option<String>,
