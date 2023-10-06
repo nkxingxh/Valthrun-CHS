@@ -21,22 +21,13 @@ pub struct WindowTracker {
     current_bounds: RECT,
 }
 
-fn to_wide_chars(s: &str) -> Vec<u16> {
-    use std::ffi::OsStr;
-    use std::os::windows::ffi::OsStrExt;
-    OsStr::new(s)
-        .encode_wide()
-        .chain(Some(0).into_iter())
-        .collect::<Vec<_>>()
-}
-
 impl WindowTracker {
     pub fn new(target: &str) -> Result<Self> {
         log::info!("正在寻找窗口: {:?}", target);
         let cs2_hwnd = unsafe {
             FindWindowW(
                 PCWSTR::null(),
-                PCWSTR::from_raw(to_wide_chars(target).as_ptr()),
+                PCWSTR::from_raw(crate::to_wide_chars(target).as_ptr()),
             )
         };
         if cs2_hwnd.0 == 0 {

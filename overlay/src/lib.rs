@@ -10,10 +10,10 @@ use imgui_winit_support::winit::window::{Window, WindowBuilder};
 use imgui_winit_support::{winit::dpi::PhysicalSize, HiDpiMode, WinitPlatform};
 use input::{KeyboardInputSystem, MouseInputSystem};
 use obfstr::obfstr;
-use std::ffi::CString;
+// use std::ffi::CString;
 use std::time::Instant;
 use window_tracker::WindowTracker;
-use windows::core::PCSTR;
+use windows::core::PCWSTR;
 use windows::Win32::Foundation::{BOOL, HWND};
 use windows::Win32::Graphics::Dwm::{
     DwmEnableBlurBehindWindow, DWM_BB_BLURREGION, DWM_BB_ENABLE, DWM_BLURBEHIND,
@@ -21,7 +21,7 @@ use windows::Win32::Graphics::Dwm::{
 use windows::Win32::Graphics::Gdi::CreateRectRgn;
 use windows::Win32::UI::Input::KeyboardAndMouse::SetActiveWindow;
 use windows::Win32::UI::WindowsAndMessaging::{
-    GetWindowLongPtrA, MessageBoxA, SetWindowDisplayAffinity, SetWindowLongA, SetWindowLongPtrA,
+    GetWindowLongPtrA, MessageBoxW, SetWindowDisplayAffinity, SetWindowLongA, SetWindowLongPtrA,
     SetWindowPos, ShowWindow, GWL_EXSTYLE, GWL_STYLE, HWND_TOPMOST, MB_ICONERROR, MB_OK,
     SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, SW_SHOWNOACTIVATE, WDA_EXCLUDEFROMCAPTURE, WDA_NONE,
     WS_CLIPSIBLINGS, WS_EX_LAYERED, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TRANSPARENT,
@@ -44,14 +44,23 @@ use vulkan_render::*;
 
 mod vulkan_driver;
 
+pub fn to_wide_chars(s: &str) -> Vec<u16> {
+    use std::ffi::OsStr;
+    use std::os::windows::ffi::OsStrExt;
+    OsStr::new(s)
+        .encode_wide()
+        .chain(Some(0).into_iter())
+        .collect::<Vec<_>>()
+}
+
 pub fn show_error_message(title: &str, message: &str) {
-    let title = CString::new(title).unwrap_or_else(|_| CString::new("[[ NulError ]]").unwrap());
-    let message = CString::new(message).unwrap_or_else(|_| CString::new("[[ NulError ]]").unwrap());
+    // let title = CString::new(title).unwrap_or_else(|_| CString::new("[[ NulError ]]").unwrap());
+    // let message = CString::new(message).unwrap_or_else(|_| CString::new("[[ NulError ]]").unwrap());
     unsafe {
-        MessageBoxA(
+        MessageBoxW(
             HWND::default(),
-            PCSTR::from_raw(message.as_ptr() as *const u8),
-            PCSTR::from_raw(title.as_ptr() as *const u8),
+            PCWSTR::from_raw(to_wide_chars(message).as_ptr()),
+            PCWSTR::from_raw(to_wide_chars(title).as_ptr()),
             MB_ICONERROR | MB_OK,
         );
     }
