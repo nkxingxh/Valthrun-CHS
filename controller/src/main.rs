@@ -499,18 +499,19 @@ fn main_overlay() -> anyhow::Result<()> {
     let app = Rc::new(RefCell::new(app));
 
     log::debug!("初始化叠加层");
+    //需要适配 反恐精英：全球攻势
     // OverlayError
-    let mut overlay = match overlay::init(obfstr!("CS2 Overlay"), obfstr!("Counter-Strike 2")) {
+    let mut overlay = match overlay::init(obfstr!("C2OL"), obfstr!("Counter-Strike 2")) {
         Err(OverlayError::VulkanDllNotFound(LoadingError::LibraryLoadFailure(source))) => {
             match &source {
                 libloading::Error::LoadLibraryExW { .. } => {
                     let error = source.source().context("LoadLibraryExW to have a source")?;
-                    let message = format!("Failed to load vulkan-1.dll.\nError: {:#}", error);
+                    let message = format!("无法加载 vulkan-1.dll.\n错误: {:#}", error);
                     show_critical_error(&message);
                 }
                 error => {
                     let message = format!(
-                        "An error occurred while loading vulkan-1.dll.\nError: {:#}",
+                        "加载 vulkan-1.dll 时发生了一个错误。\n错误: {:#}",
                         error
                     );
                     show_critical_error(&message);
@@ -518,8 +519,10 @@ fn main_overlay() -> anyhow::Result<()> {
             }
             return Ok(());
         }
-        value => value?,
-    };
+        // value => value?,
+        Ok(v) => Ok(v),
+        Err(_e) => overlay::init(obfstr!("C2OL"), obfstr!("\u{53cd}\u{6050}\u{7cbe}\u{82f1}\u{ff1a}\u{5168}\u{7403}\u{653b}\u{52bf}"))
+    }?;
     if let Some(imgui_settings) = imgui_settings {
         overlay.imgui.load_ini_settings(&imgui_settings);
     }
