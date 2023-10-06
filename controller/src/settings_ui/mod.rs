@@ -204,6 +204,10 @@ impl SettingsUI {
                         if ui.checkbox("截图时隐藏叠加层", &mut settings.hide_overlay_from_screen_capture) {
                             app.settings_screen_capture_changed.store(true, Ordering::Relaxed);
                         }
+
+                        // FPS Limit
+                        ui.slider_config("Overlay FPS Limit", 0, 960)
+                            .build(&mut settings.overlay_fps_limit);
                     }
 
                     if let Some(_) = ui.tab_item("辅助瞄准") {

@@ -226,7 +226,15 @@ impl Application {
                 ui.text(text);
             }
             {
-                let text = format!("{:.2} FPS", ui.io().framerate);
+                let current_fps = ui.io().framerate;
+                if settings.overlay_fps_limit > 0 && current_fps as u32 > settings.overlay_fps_limit {
+                    let duration = std::time::Duration::from_millis(
+                        ((1000.0 / current_fps) * (current_fps - settings.overlay_fps_limit as f32))
+                        as u64
+                    );
+                    std::thread::sleep(duration);
+                }
+                let text = format!("{:.2} FPS", current_fps);
                 ui.set_cursor_pos([
                     ui.window_size()[0] - ui.calc_text_size(&text)[0] - 10.0,
                     24.0,

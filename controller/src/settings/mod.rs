@@ -114,6 +114,9 @@ pub struct AppSettings {
     #[serde(default = "bool_true")]
     pub hide_overlay_from_screen_capture: bool,
 
+    #[serde(default = "default_u32::<0>")]
+    pub overlay_fps_limit: u32,
+
     #[serde(default)]
     pub imgui: Option<String>,
 }
