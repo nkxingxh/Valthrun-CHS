@@ -546,8 +546,8 @@ fn main_overlay() -> anyhow::Result<()> {
 
             if let Err(err) = app.update(ui) {
                 if update_fail_count >= 10 {
-                    log::error!("Over 10 errors occurred. Waiting 1s and try again.");
-                    log::error!("Last error: {:#}", err);
+                    log::error!("出现 10 多个错误。等待 1 秒后再试。");
+                    log::error!("最后一个错误: {:#}", err);
 
                     update_timeout = Some((Instant::now(), Duration::from_millis(1000)));
                     update_fail_count = 0;
