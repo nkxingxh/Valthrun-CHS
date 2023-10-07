@@ -242,6 +242,10 @@ impl SettingsUI {
                         if ui.checkbox("显示渲染调试叠加层", &mut settings.render_debug_window) {
                             app.settings_render_debug_window_changed.store(true, Ordering::Relaxed);
                         }
+
+                        // FPS Limit
+                        ui.slider_config("叠加层 FPS 限制", 0, 960)
+                            .build(&mut settings.overlay_fps_limit);
                     }
                 }
             });
