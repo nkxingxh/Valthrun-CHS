@@ -294,10 +294,11 @@ impl Application {
             }
             {
                 let current_fps = ui.io().framerate;
-                if settings.overlay_fps_limit > 0 && current_fps as u32 > settings.overlay_fps_limit {
+                if settings.overlay_fps_limit > 0 && current_fps as u32 > settings.overlay_fps_limit
+                {
                     let duration = std::time::Duration::from_millis(
                         ((1000.0 / current_fps) * (current_fps - settings.overlay_fps_limit as f32))
-                        as u64
+                            as u64,
                     );
                     std::thread::sleep(duration);
                 }
@@ -457,10 +458,8 @@ fn main_overlay() -> anyhow::Result<()> {
             return Err(err);
         }
     };
-    let cs2_build_info = BuildInfo::read_build_info(&cs2).with_context(|| {
-        obfstr!("加载 CS2 构建信息失败。CS2 版本可能高于/低于预期")
-            .to_string()
-    })?;
+    let cs2_build_info = BuildInfo::read_build_info(&cs2)
+        .with_context(|| obfstr!("加载 CS2 构建信息失败。CS2 版本可能高于/低于预期").to_string())?;
     log::info!(
         "已找到 {} 修订版本 {} 来自 {}.",
         obfstr!("Counter-Strike 2"),
@@ -525,7 +524,10 @@ fn main_overlay() -> anyhow::Result<()> {
     log::debug!("初始化叠加层");
     //需要适配 反恐精英：全球攻势
     // OverlayError
-    let mut overlay = match overlay::init(obfstr!("C2OL"), app.borrow().cs2.module_info.process_id as u32) {
+    let mut overlay = match overlay::init(
+        obfstr!("C2OL"),
+        app.borrow().cs2.module_info.process_id as u32,
+    ) {
         Err(OverlayError::VulkanDllNotFound(LoadingError::LibraryLoadFailure(source))) => {
             match &source {
                 libloading::Error::LoadLibraryExW { .. } => {
@@ -534,10 +536,8 @@ fn main_overlay() -> anyhow::Result<()> {
                     show_critical_error(&message);
                 }
                 error => {
-                    let message = format!(
-                        "加载 vulkan-1.dll 时发生了一个错误。\n错误: {:#}",
-                        error
-                    );
+                    let message =
+                        format!("加载 vulkan-1.dll 时发生了一个错误。\n错误: {:#}", error);
                     show_critical_error(&message);
                 }
             }

@@ -6,8 +6,9 @@ use copypasta::ClipboardContext;
 use imgui::{
     Context,
     FontConfig,
+    FontGlyphRanges,
     FontSource,
-    Io, FontGlyphRanges,
+    Io,
 };
 use imgui_rs_vulkan_renderer::{
     Options,
@@ -59,6 +60,7 @@ use windows::{
             Input::KeyboardAndMouse::SetActiveWindow,
             WindowsAndMessaging::{
                 GetWindowLongPtrA,
+                MessageBoxW,
                 SetWindowDisplayAffinity,
                 SetWindowLongA,
                 SetWindowLongPtrA,
@@ -81,7 +83,7 @@ use windows::{
                 WS_EX_TOOLWINDOW,
                 WS_EX_TRANSPARENT,
                 WS_POPUP,
-                WS_VISIBLE, MessageBoxW,
+                WS_VISIBLE,
             },
         },
     },
@@ -104,8 +106,10 @@ use vulkan_render::*;
 mod vulkan_driver;
 
 pub fn to_wide_chars(s: &str) -> Vec<u16> {
-    use std::ffi::OsStr;
-    use std::os::windows::ffi::OsStrExt;
+    use std::{
+        ffi::OsStr,
+        os::windows::ffi::OsStrExt,
+    };
     OsStr::new(s)
         .encode_wide()
         .chain(Some(0).into_iter())
