@@ -1,16 +1,39 @@
-use crate::error::{OverlayError, Result};
-use imgui_winit_support::winit::{platform::windows::WindowExtWindows, window::Window};
+use imgui_winit_support::winit::{
+    platform::windows::WindowExtWindows,
+    window::Window,
+};
 use windows::Win32::{
-        Foundation::{
-            GetLastError, ERROR_INVALID_WINDOW_HANDLE, HWND, LPARAM, POINT, RECT, WPARAM,
+    Foundation::{
+        GetLastError,
+        ERROR_INVALID_WINDOW_HANDLE,
+        HWND,
+        LPARAM,
+        POINT,
+        RECT,
+        WPARAM,
+    },
+    Graphics::Gdi::ClientToScreen,
+    System::SystemInformation::GetTickCount,
+    UI::{
+        Input::KeyboardAndMouse::GetFocus,
+        WindowsAndMessaging::{
+            FindWindowExA,
+            GetClassNameW,
+            GetClientRect,
+            GetParent,
+            GetWindowThreadProcessId,
+            IsWindowVisible,
+            MoveWindow,
+            SendMessageA,
+            WM_PAINT,
         },
-        Graphics::Gdi::ClientToScreen,
-        UI::{
-            Input::KeyboardAndMouse::GetFocus,
-            WindowsAndMessaging::{GetClientRect, MoveWindow, SendMessageA, WM_PAINT, FindWindowExA, GetClassNameW, IsWindowVisible, GetWindowThreadProcessId, GetParent},
-        },
-    };
-use windows::Win32::System::SystemInformation::GetTickCount;
+    },
+};
+
+use crate::error::{
+    OverlayError,
+    Result,
+};
 
 /// Track the CS2 window and adjust overlay accordingly.
 /// This is only required when playing in windowed mode.
@@ -64,7 +87,6 @@ fn get_window_handle_by_process_id(
     0
 }
 
-// 自定义函数，用于获取窗口类名
 fn get_window_class_name(hwnd: u32) -> String {
     let mut buffer = [0u16; 256];
     let len = unsafe { GetClassNameW(HWND(hwnd as isize), &mut buffer) };
@@ -73,18 +95,12 @@ fn get_window_class_name(hwnd: u32) -> String {
 
 impl WindowTracker {
     pub fn new(target: u32) -> Result<Self> {
-        log::trace!("正在寻找游戏窗口，其进程 PID 为 {:?}", target);
-        // let cs2_hwnd = unsafe {
-        //     FindWindowW(
-        //         PCWSTR::null(),
-        //         PCWSTR::from_raw(crate::to_wide_chars(target).as_ptr()),
-        //     )
-        // };
+        log::trace!("正在寻找游戏窗口，其进程 ID 为 {:?}", target);
         let cs2_hwnd = match get_window_handle_by_process_id(target, None, Some(10000), None) {
             v if v <= 0 => return Err(OverlayError::WindowNotFound),
-            v => HWND(v as isize)
+            v => HWND(v as isize),
         };
-        
+
         if cs2_hwnd.0 == 0 {
             return Err(OverlayError::WindowNotFound);
         }
@@ -130,7 +146,7 @@ impl WindowTracker {
         }
 
         self.current_bounds = rect;
-        log::debug!("窗口边界发生变化: {:?}", rect);
+        log::debug!("Window bounds changed: {:?}", rect);
         unsafe {
             let overlay_hwnd = HWND(overlay.hwnd());
             MoveWindow(

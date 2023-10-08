@@ -2,22 +2,11 @@
 #![feature(result_option_inspect)]
 #![allow(dead_code)]
 
-use anyhow::Context;
-use cache::EntryCache;
-use clap::{Args, Parser, Subcommand};
-use cs2::{
-    CS2Handle, CS2Model, CS2Offsets, EngineBuildInfo, EntitySystem, Globals, Module, PCStrEx,
-    Signature,
-};
-use cs2_schema_declaration::Ptr;
-use enhancements::Enhancement;
-use imgui::{Condition, Ui};
-use obfstr::obfstr;
-use overlay::{LoadingError, OverlayError, SystemRuntimeController};
-use settings::{load_app_settings, AppSettings};
-use settings_ui::SettingsUI;
 use std::{
-    cell::{RefCell, RefMut},
+    cell::{
+        RefCell,
+        RefMut,
+    },
     error::Error,
     fmt::Debug,
     fs::File,
@@ -25,33 +14,85 @@ use std::{
     path::PathBuf,
     rc::Rc,
     sync::{
-        atomic::{AtomicBool, Ordering},
+        atomic::{
+            AtomicBool,
+            Ordering,
+        },
         Arc,
     },
-    time::{Duration, Instant},
+    time::{
+        Duration,
+        Instant,
+    },
+};
+
+use anyhow::Context;
+use build::BuildInfo;
+use cache::EntryCache;
+use clap::{
+    Args,
+    Parser,
+    Subcommand,
+};
+use class_name_cache::ClassNameCache;
+use cs2::{
+    CS2Handle,
+    CS2Model,
+    CS2Offsets,
+    EntitySystem,
+    Globals,
+};
+use enhancements::Enhancement;
+use imgui::{
+    Condition,
+    Ui,
+};
+use obfstr::obfstr;
+use overlay::{
+    LoadingError,
+    OverlayError,
+    SystemRuntimeController,
+};
+use settings::{
+    load_app_settings,
+    AppSettings,
+    SettingsUI,
 };
 use valthrun_kernel_interface::KInterfaceError;
 use view::ViewController;
-use windows::Win32::{System::Console::GetConsoleProcessList, UI::Shell::IsUserAnAdmin};
-
-use crate::{
-    enhancements::{AntiAimPunsh, BombInfo, PlayerESP, TriggerBot},
-    settings::save_app_settings,
-    view::LocalCrosshair,
+use windows::Win32::{
+    System::Console::GetConsoleProcessList,
+    UI::Shell::IsUserAnAdmin,
 };
 
+use crate::{
+    enhancements::{
+        AntiAimPunsh,
+        BombInfo,
+        PlayerESP,
+        TriggerBot,
+    },
+    settings::save_app_settings,
+    view::LocalCrosshair,
+    winver::version_info,
+};
+
+mod build;
 mod cache;
+mod class_name_cache;
 mod enhancements;
 mod settings;
-mod settings_ui;
+mod utils;
 mod view;
+mod weapon;
+mod winver;
 
-pub trait UpdateInputState {
+pub trait KeyboardInput {
     fn is_key_down(&self, key: imgui::Key) -> bool;
     fn is_key_pressed(&self, key: imgui::Key, repeating: bool) -> bool;
 }
 
-impl UpdateInputState for imgui::Ui {
+impl KeyboardInput for imgui::Ui {
     fn is_key_down(&self, key: imgui::Key) -> bool {
         Ui::is_key_down(self, key)
     }
@@ -67,13 +108,13 @@ impl UpdateInputState for imgui::Ui {
 
 pub struct UpdateContext<'a> {
     pub settings: &'a AppSettings,
-    pub input: &'a dyn UpdateInputState,
+    pub input: &'a dyn KeyboardInput,
 
     pub cs2: &'a Arc<CS2Handle>,
     pub cs2_entities: &'a EntitySystem,
 
     pub model_cache: &'a EntryCache<u64, CS2Model>,
-    pub class_name_cache: &'a EntryCache<Ptr<()>, Option<String>>,
+    pub class_name_cache: &'a ClassNameCache,
     pub view_controller: &'a ViewController,
 
     pub globals: Globals,
@@ -87,7 +128,7 @@ pub struct Application {
     pub cs2_build_info: BuildInfo,
 
     pub model_cache: EntryCache<u64, CS2Model>,
-    pub class_name_cache: EntryCache<Ptr<()>, Option<String>>,
+    pub class_name_cache: ClassNameCache,
     pub view_controller: ViewController,
 
     pub enhancements: Vec<Rc<RefCell<dyn Enhancement>>>,
@@ -181,6 +222,14 @@ impl Application {
             .cached()
             .with_context(|| obfstr!("failed to read globals").to_string())?;
 
+        self.cs2_entities
+            .read_entities()
+            .with_context(|| obfstr!("failed to read global entity list").to_string())?;
+
+        self.class_name_cache
+            .update_cache(self.cs2_entities.all_identities())
+            .with_context(|| obfstr!("failed to update class name cache").to_string())?;
+
         let update_context = UpdateContext {
             cs2: &self.cs2,
             cs2_entities: &self.cs2_entities,
@@ -214,6 +263,14 @@ impl Application {
             .size(ui.io().display_size, Condition::Always)
             .position([0.0, 0.0], Condition::Always)
             .build(|| self.render_overlay(ui));
+
+        {
+            let mut settings = self.settings.borrow_mut();
+            for enhancement in self.enhancements.iter() {
+                let mut enhancement = enhancement.borrow_mut();
+                enhancement.render_debug_window(&mut *settings, ui);
+            }
+        }
 
         if self.settings_visible {
             let mut settings_ui = self.settings_ui.borrow_mut();
@@ -359,40 +416,14 @@ fn main_schema_dump(args: &SchemaDumpArgs) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[derive(Debug)]
-pub struct BuildInfo {
-    revision: String,
-    build_datetime: String,
-}
-
-impl BuildInfo {
-    fn find_build_info(cs2: &CS2Handle) -> anyhow::Result<u64> {
-        cs2.resolve_signature(
-            Module::Engine,
-            &Signature::relative_address(
-                obfstr!("client build info"),
-                obfstr!("48 8B 1D ? ? ? ? 48 85 DB 74 6B"),
-                0x03,
-                0x07,
-            ),
-        )
-    }
-
-    pub fn read_build_info(cs2: &CS2Handle) -> anyhow::Result<Self> {
-        let address = Self::find_build_info(cs2)?;
-        let engine_build_info = cs2.read_schema::<EngineBuildInfo>(&[address])?;
-        Ok(Self {
-            revision: engine_build_info.revision()?.read_string(&cs2)?,
-            build_datetime: format!(
-                "{} {}",
-                engine_build_info.build_date()?.read_string(&cs2)?,
-                engine_build_info.build_time()?.read_string(&cs2)?
-            ),
-        })
-    }
-}
-
 fn main_overlay() -> anyhow::Result<()> {
+    let build_info = version_info()?;
+    log::info!(
+        "Valthrun 版本 {}. Windows 构建 {}.",
+        env!("CARGO_PKG_VERSION"),
+        build_info.dwBuildNumber
+    );
+
     let settings = load_app_settings()?;
 
     let cs2 = match CS2Handle::create() {
@@ -465,14 +496,7 @@ fn main_overlay() -> anyhow::Result<()> {
                 Ok(CS2Model::read(&cs2, *model as u64)?)
             }
         }),
-        class_name_cache: EntryCache::new({
-            let cs2 = cs2.clone();
-            move |class_info: &Ptr<()>| {
-                let address = class_info.address()?;
-                let class_name = cs2.read_string(&[address + 0x28, 0x08, 0x00], Some(32))?;
-                Ok(Some(class_name))
-            }
-        }),
+        class_name_cache: ClassNameCache::new(cs2.clone()),
         view_controller: ViewController::new(cs2_offsets.clone()),
 
         enhancements: vec![
