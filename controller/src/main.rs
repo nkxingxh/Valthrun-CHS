@@ -420,7 +420,7 @@ fn main_schema_dump(args: &SchemaDumpArgs) -> anyhow::Result<()> {
 fn main_overlay() -> anyhow::Result<()> {
     let build_info = version_info()?;
     log::info!(
-        "Valthrun 版本 {}. Windows 构建 {}.",
+        "Valthrun 版本 {}，Windows 内部版本 {}。",
         env!("CARGO_PKG_VERSION"),
         build_info.dwBuildNumber
     );

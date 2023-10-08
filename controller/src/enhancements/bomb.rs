@@ -195,7 +195,7 @@ impl Enhancement for BombInfo {
 
         ui.set_cursor_pos([offset_x, offset_y]);
         ui.text(&format!(
-            "Bomb planted {}",
+            "炸弹安放在 {}",
             if bomb_info.bomb_site == 0 { "A" } else { "B" }
         ));
 

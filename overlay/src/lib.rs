@@ -194,7 +194,7 @@ fn create_imgui_context() -> Result<(WinitPlatform, imgui::Context)> {
         data: include_bytes!("../resources/SourceHanSerifCN-VF.ttf"),
         size_pixels: font_size,
         config: Some(FontConfig {
-            glyph_ranges: FontGlyphRanges::chinese_simplified_common(),
+            glyph_ranges: FontGlyphRanges::chinese_full(),
             // As imgui-glium-renderer isn't gamma-correct with
             // it's font rendering, we apply an arbitrary
             // multiplier to make the font a bit "heavier". With
