@@ -501,7 +501,7 @@ fn main_overlay() -> anyhow::Result<()> {
     log::debug!("初始化叠加层");
     //需要适配 反恐精英：全球攻势
     // OverlayError
-    let mut overlay = match overlay::init(obfstr!("C2OL"), obfstr!("Counter-Strike 2")) {
+    let mut overlay = match overlay::init(obfstr!("C2OL"), app.borrow().cs2.module_info.process_id as u32) {
         Err(OverlayError::VulkanDllNotFound(LoadingError::LibraryLoadFailure(source))) => {
             match &source {
                 libloading::Error::LoadLibraryExW { .. } => {
@@ -519,10 +519,8 @@ fn main_overlay() -> anyhow::Result<()> {
             }
             return Ok(());
         }
-        // value => value?,
-        Ok(v) => Ok(v),
-        Err(_e) => overlay::init(obfstr!("C2OL"), obfstr!("\u{53cd}\u{6050}\u{7cbe}\u{82f1}\u{ff1a}\u{5168}\u{7403}\u{653b}\u{52bf}"))
-    }?;
+        value => value?,
+    };
     if let Some(imgui_settings) = imgui_settings {
         overlay.imgui.load_ini_settings(&imgui_settings);
     }
