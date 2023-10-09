@@ -1,5 +1,3 @@
-#![feature(iterator_try_collect)]
-#![feature(result_option_inspect)]
 #![allow(dead_code)]
 
 use std::{
@@ -51,6 +49,7 @@ use obfstr::obfstr;
 use overlay::{
     LoadingError,
     OverlayError,
+    OverlayTarget,
     SystemRuntimeController,
 };
 use settings::{
@@ -425,28 +424,20 @@ fn main_overlay() -> anyhow::Result<()> {
         build_info.dwBuildNumber
     );
 
-    let settings = load_app_settings()?;
+    if unsafe { IsUserAnAdmin().as_bool() } {
+        show_critical_error("请不要以管理员身份运行！\n以管理员身份运行控制器可能会导致图形驱动程序出现故障。");
+        return Ok(());
+    }
 
+    let settings = load_app_settings()?;
     let cs2 = match CS2Handle::create() {
         Ok(handle) => handle,
         Err(err) => {
             if let Some(err) = err.downcast_ref::<KInterfaceError>() {
                 if let KInterfaceError::DeviceUnavailable(error) = &err {
-                    if !unsafe { IsUserAnAdmin().as_bool() } {
-                        if !is_console_invoked() {
-                            /* If we don't have a console, show the message box and abort execution. */
-                            show_critical_error("请以管理员身份重新运行此程序！");
-                            return Ok(());
-                        }
-
-                        /* Just print this warning message and return the actual error.  */
-                        log::warn!("程序运行时无管理员权限。");
-                        log::warn!("请以管理员身份重新运行！");
-                    }
-
                     if error.code().0 as u32 == 0x80070002 {
                         /* The system cannot find the file specified. */
-                        show_critical_error("无法找到内核驱动程序接口。\n在启动控制器之前，请确保已成功加载或映射内核驱动程序 (valthrun-driver.sys)。\n请明确检查驱动程序入口状态代码，该代码应为 0x0。\n\n如需更多帮助，请查阅: \nhttps://github.com/nkxingxh/Valthrun-CHS/tree/master/doc/troubleshooting");
+                        show_critical_error("** 请仔细阅读 **\n无法找到内核驱动程序接口。\n在启动控制器之前，请确保已成功加载或映射内核驱动程序 (valthrun-driver.sys)。请明确检查驱动程序入口状态代码，该代码应为 0x0。\n\n如需更多帮助，请查阅: \nhttps://github.com/nkxingxh/Valthrun-CHS/tree/master/doc/troubleshooting");
                         return Ok(());
                     }
                 } else if let KInterfaceError::ProcessDoesNotExists = &err {
@@ -521,13 +512,12 @@ fn main_overlay() -> anyhow::Result<()> {
 
     let app = Rc::new(RefCell::new(app));
 
-    log::debug!("初始化叠加层");
-    //需要适配 反恐精英：全球攻势
+    log::debug!("Initialize overlay");
+
     // OverlayError
-    let mut overlay = match overlay::init(
-        obfstr!("C2OL"),
-        app.borrow().cs2.module_info.process_id as u32,
-    ) {
+    let overlay_target =
+        OverlayTarget::WindowOfProcess(app.borrow().cs2.module_info.process_id as u32);
+    let mut overlay = match overlay::init(obfstr!("CS2 Overlay"), overlay_target) {
         Err(OverlayError::VulkanDllNotFound(LoadingError::LibraryLoadFailure(source))) => {
             match &source {
                 libloading::Error::LoadLibraryExW { .. } => {

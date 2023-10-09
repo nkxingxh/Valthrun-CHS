@@ -94,6 +94,7 @@ mod error;
 pub use error::*;
 mod input;
 mod window_tracker;
+pub use window_tracker::OverlayTarget;
 
 mod vulkan;
 
@@ -103,6 +104,7 @@ pub use perf::PerfTracker;
 mod vulkan_render;
 use vulkan_render::*;
 
+mod util;
 mod vulkan_driver;
 
 pub fn to_wide_chars(s: &str) -> Vec<u16> {
@@ -230,8 +232,8 @@ pub struct System {
     pub window_tracker: WindowTracker,
 }
 
-pub fn init(title: &str, target_process_id: u32) -> Result<System> {
-    let window_tracker = WindowTracker::new(target_process_id)?;
+pub fn init(title: &str, target: OverlayTarget) -> Result<System> {
+    let window_tracker = WindowTracker::new(target)?;
 
     let event_loop = EventLoop::new();
     let window = create_window(&event_loop, title)?;
