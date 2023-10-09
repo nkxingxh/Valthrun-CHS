@@ -425,7 +425,9 @@ fn main_overlay() -> anyhow::Result<()> {
     );
 
     if unsafe { IsUserAnAdmin().as_bool() } {
-        show_critical_error("请不要以管理员身份运行！\n以管理员身份运行控制器可能会导致图形驱动程序出现故障。");
+        show_critical_error(
+            "请不要以管理员身份运行！\n以管理员身份运行控制器可能会导致图形驱动程序出现故障。",
+        );
         return Ok(());
     }
 

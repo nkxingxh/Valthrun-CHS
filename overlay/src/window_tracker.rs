@@ -91,11 +91,7 @@ impl OverlayTarget {
                         continue;
                     }
 
-                    log::debug!(
-                        "发现窗口 0x{:X}，属于进程 {}",
-                        current_hwnd.0,
-                        process_id
-                    );
+                    log::debug!("发现窗口 0x{:X}，属于进程 {}", current_hwnd.0, process_id);
                     return Ok(current_hwnd);
                 }
 
