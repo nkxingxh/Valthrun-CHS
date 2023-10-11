@@ -43,8 +43,8 @@ Valthrun 提供各种外部工具，让您的游戏体验更加精彩。
 
 要打开 Valthruns 菜单，请按 `PAUSE` 键。
 
-## 计划功能
-- Aim Bot
+## 计划开发的功能
+- Aimbot
 - Spectator info
   - List of player currently watching you / the observer target
 - Player competitive ranks / wins
@@ -59,23 +59,23 @@ Valthrun 不需要安裝。
 Once downloaded read [How to use](#如何使用) to get started!
 
 # 如何使用
-The following steps need to be done for starting/activating the overlay.
+The following steps need to be done to enable the overlay.
 1. Load the kernel driver  
    The overlay requires the kernel driver for all memory reads and writes.
    Therefore we need to load the driver before we can start the overlay. It's not strictly required to load the driver before starting CS2 but logically it makes sense to start with the driver.
      
    There are two common options to load the kernel driver:
    1. Manually map the driver using a vulnerable driver
-      The Valthrun kernel driver fully supports manual driver mapping using a any   vulnerable driver. In order to detect the manual mapping the second driver entry argument (the   registry patch) must be a null ptr.  
+      The Valthrun kernel driver fully supports manual driver mapping using a vulnerable driver. In order to detect the manual mapping the second driver entry argument (the registry patch) must be a nullptr.  
       The kernel driver will automatically allocate a new driver for io communication.  
 
       In order to manually map the Valthrun driver you can use tools like  
-      - [kdmapper](https://github.com/TheCruZ/kdmapper)
-      - [KDU](https://github.com/hfiref0x/KDU) (does not always work...)
+      - [kdmapper](https://github.com/TheCruZ/kdmapper) (recommended)
+      - [KDU](https://github.com/hfiref0x/KDU) (unstable)
 
    2. Setting Windows into test-signing mode  
       TODO: Explain how to set Windows into test signing
-      Helpfull guide: https://github.com/dretax/GarHal_CSGO#starting-driver
+      Helpful guide: https://github.com/dretax/GarHal_CSGO#starting-driver
    
 2. Start Counter-Strike 2  
 After loading the driver you can start Counter-Strike 2 as usual.  
@@ -89,7 +89,7 @@ To explore all command line options of the controller, start the controller from
 .\controller.exe -h
 ```
 
-When you want extra/verbose output, start the overlay from the terminal and previously set the `RUST_LOG` environment variable.  
+If you want a verbose output (useful for troubleshooting), start the overlay from the terminal and previously set the `RUST_LOG` environment variable.  
 Example for executing the overlay with trace output:  
 ```ps1
 $env:RUST_LOG="trace"
@@ -100,18 +100,16 @@ $env:RUST_LOG="trace"
 If you are having issues mapping the kernel driver or starting the controller, please take a look [here](https://github.com/WolverinDEV/Valthrun/tree/master/doc/troubleshooting):  
 https://github.com/WolverinDEV/Valthrun/tree/master/doc/troubleshooting
   
-The issue you encounter is most likely covered. If you still have any questions or need assistens, feel free to checkout the official Valthrun Discord server ([click to join](https://discord.gg/ecKbpAPW5T)).
+The issue you encounter is most likely covered. If you still have any questions or need assistance, feel free to checkout the official Valthrun Discord server ([click to join](https://discord.gg/ecKbpAPW5T)).
 
 # VAC
 The same considerations as mentioned in [this link](https://github.com/dretax/GarHal_CSGO#starting-driver) have been taken into account.  
-With these precautions and some minor improvements, such as omitting the valthrun identifier and using xor-ing for strings, the driver/overlay should avoid VAC detection. However, I must clarify that I haven't extensively studied VAC, so my conclusion is speculative. Personally, I have been using a C based driver/overlay like this with CSGO for several years without ever getting VAC banned. But be aware of overwatch!  
-Unfortunately, since I'm not part of the closed CS2 beta,  
-I haven't had the opportunity to test the overlay with VAC live,  
-but I assume it should work similarly well.
+With these precautions and some minor improvements, such as omitting the Valthrun identifier and using xor encryption for strings, the driver/overlay should avoid VAC detection. However, I must clarify that I haven't extensively studied VAC, so my conclusion is speculative. Personally, I have been using a C based driver/overlay like this with CSGO for several years without ever getting VAC banned. But be aware of overwatch!  
+With VAC live being enabled now, use this with caution. As always take the necessary precautions into consideration.
 
 # Supported Windows Versions
 All recent Windows versions should be supported as all functions / struct offsets are resolved dynamically.  
-The latest Win 10 and Win 11 versions (22H2) have been tested. User feedback suggests, Windows versions back 'till 20H2 are working.
+The latest Win 10 and Win 11 versions (22H2) have been tested. User feedback suggests, Windows versions as far back as 20H2 are working.
 If you encounter an issue, please submit an issue containing your Windows version and detailing the error you encounter.  
   
 # Screenshots
@@ -119,5 +117,5 @@ If you encounter an issue, please submit an issue containing your Windows versio
 ![](./img/showcase_02.png)
 
 # Help
-You can find help on the official Valthrun Discord server:
+You can find help on the official Valthrun Discord server:  
 [![Discord Shield](https://discordapp.com/api/guilds/1135362291311849693/widget.png?style=shield)](https://discord.gg/ecKbpAPW5T)

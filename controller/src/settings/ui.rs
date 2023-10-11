@@ -138,6 +138,14 @@ impl SettingsUI {
                                 ui.slider_config(obfstr!("方框线宽"), 0.1, 10.0)
                                     .build(&mut settings.esp_boxes_thickness);
                             }
+                            if settings.esp_box_type == EspBoxType::Box2D {
+                                ui.checkbox(obfstr!("2DBOX: 显示血量条"), &mut settings.esp_health_bar);
+                                if settings.esp_health_bar {
+                                    ui.same_line();
+                                    ui.checkbox(obfstr!("增大尺寸"), &mut settings.esp_health_bar_size);
+                                    ui.checkbox(obfstr!("花里胡哨血量条"), &mut settings.rainbow_health_bar);
+                                }
+                            }
 
                             ui.checkbox(obfstr!("ESP 骨架"), &mut settings.esp_skeleton);
                             if settings.esp_skeleton {
