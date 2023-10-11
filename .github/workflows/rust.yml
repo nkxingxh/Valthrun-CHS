@@ -41,3 +41,8 @@ jobs:
     #   if: ${{ github.event_name != 'pull_request' }}
     #   env:
     #     DISCORD_RELEASE_WEBHOOK: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
+    - name: Upload
+      uses: actions/upload-artifact@v3
+      with:
+        name: controller.exe
+        path: target/release/controller.exe
