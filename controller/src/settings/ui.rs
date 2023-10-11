@@ -139,11 +139,11 @@ impl SettingsUI {
                                     .build(&mut settings.esp_boxes_thickness);
                             }
                             if settings.esp_box_type == EspBoxType::Box2D {
-                                ui.checkbox(obfstr!("2DBOX: 显示血量条"), &mut settings.esp_health_bar);
+                                ui.checkbox(obfstr!("2D 方框: 显示血量条"), &mut settings.esp_health_bar);
                                 if settings.esp_health_bar {
                                     ui.same_line();
-                                    ui.checkbox(obfstr!("增大尺寸"), &mut settings.esp_health_bar_size);
-                                    ui.checkbox(obfstr!("花里胡哨血量条"), &mut settings.rainbow_health_bar);
+                                    ui.slider("血量条尺寸", 2.0, 20.0, &mut settings.esp_health_bar_size);
+                                    ui.checkbox(obfstr!("花里胡哨血量条"), &mut settings.esp_health_bar_rainbow);
                                 }
                             }
 
@@ -153,7 +153,6 @@ impl SettingsUI {
                                     .build(&mut settings.esp_skeleton_thickness);
                             }
 
-                            ui.checkbox(obfstr!("显示玩家生命值"), &mut settings.esp_info_health);
                             ui.checkbox(obfstr!("显示玩家武器"), &mut settings.esp_info_weapon);
 
                             ui.checkbox(obfstr!("ESP 显示我方"), &mut settings.esp_enabled_team);

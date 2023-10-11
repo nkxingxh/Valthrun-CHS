@@ -1,5 +1,3 @@
-const HEALTH_BAR_MAX_HEALTH: f32 = 100.0;
-
 use std::{
     ffi::CStr,
     sync::Arc,
@@ -188,8 +186,28 @@ impl PlayerESP {
             model: model.clone(),
         }))
     }
+
+    pub fn calculate_rainbow_color(value: f32, alpha: f32) -> [f32; 4] {
+        let sin_value = |offset: f32| (2.0 * std::f32::consts::PI * value * 0.75 + offset).sin() * 0.5 + 1.0;
+        let r: f32 = sin_value(0.0);
+        let g: f32 = sin_value(2.0 * std::f32::consts::PI / 3.0);
+        let b: f32 = sin_value(4.0 * std::f32::consts::PI / 3.0);
+        [r, g, b, alpha]
+    }
+
+    pub fn calculate_health_color(health_percentage: f32, alpha: f32) -> [f32; 4] {
+        let clamped_percentage = health_percentage.clamp(0.0, 1.0);
+
+        let r = 1.0 - clamped_percentage;
+        let g = clamped_percentage;
+        let b = 0.0;
+
+        [r, g, b, alpha]
+    }
 }
 
+const HEALTH_BAR_MAX_HEALTH: f32 = 100.0;
+const HEALTH_BAR_BORDER_WIDTH: f32 = 1.0;
 impl Enhancement for PlayerESP {
     fn update_settings(
         &mut self,
@@ -214,8 +232,7 @@ impl Enhancement for PlayerESP {
 
         if !ctx.settings.esp
             || !(ctx.settings.esp_boxes
-                || ctx.settings.esp_skeleton
-                || ctx.settings.esp_info_health)
+                || ctx.settings.esp_skeleton)
         {
             return Ok(());
         }
@@ -353,56 +370,35 @@ impl Enhancement for PlayerESP {
                                 .build();
 
                             if settings.esp_health_bar {
-                                let bar_height = vmax.y - vmin.y;
+                                let bar_y = vmin.y - settings.esp_boxes_thickness / 2.0 + HEALTH_BAR_BORDER_WIDTH / 2.0;
+                                let bar_x = vmin.x - settings.esp_health_bar_size - HEALTH_BAR_BORDER_WIDTH;
 
-                                let player_health = entry.player_health as f32;
-                                let clamped_player_health =
-                                    player_health.clamp(0.0, HEALTH_BAR_MAX_HEALTH);
-                                let health_percentage =
-                                    clamped_player_health / HEALTH_BAR_MAX_HEALTH;
-                                let filled_height = bar_height * health_percentage;
+                                let bar_height = vmax.y - vmin.y + settings.esp_boxes_thickness;
+                                let bar_width = settings.esp_health_bar_size;
 
-                                let border_color = [0.0, 0.0, 0.0, esp_color[3]];
+                                /* player health in [0.0; 1.0] */
+                                let normalized_player_health = (entry.player_health as f32)
+                                    .clamp(0.0, HEALTH_BAR_MAX_HEALTH) / HEALTH_BAR_MAX_HEALTH;
 
-                                let bar_width = if settings.esp_health_bar_size {
-                                    6.0
+                                let bar_color = if settings.esp_health_bar_rainbow {
+                                    Self::calculate_rainbow_color(normalized_player_health, esp_color[3])
                                 } else {
-                                    1.0
+                                    Self::calculate_health_color(normalized_player_health, esp_color[3])
                                 };
 
-                                let bar_x = if settings.esp_health_bar_size {
-                                    vmin.x - bar_width + 1.0
-                                } else {
-                                    vmin.x + 1.0
-                                };
                                 draw.add_rect(
-                                    [vmin.x - bar_width, vmax.y - 1.0],
-                                    [vmin.x + 1.0, vmin.y + 1.0],
-                                    border_color,
+                                    [bar_x + HEALTH_BAR_BORDER_WIDTH, bar_y + HEALTH_BAR_BORDER_WIDTH + bar_height * (1.0 - normalized_player_health)],
+                                    [bar_x + bar_width - HEALTH_BAR_BORDER_WIDTH, bar_y + bar_height - HEALTH_BAR_BORDER_WIDTH * 2.0],
+                                    bar_color,
                                 )
+                                .filled(true)
                                 .build();
-
-                                if settings.rainbow_health_bar {
-                                    let rainbow_color = view
-                                        .calculate_rainbow_color(player_health as f32, *esp_color);
-                                    draw.add_rect(
-                                        [bar_x, vmax.y - 1.0],
-                                        [vmin.x, (vmax.y + 1.0) - filled_height],
-                                        rainbow_color,
-                                    )
-                                    .filled(true)
-                                    .build();
-                                } else {
-                                    let health_color =
-                                        view.calculate_health_color(health_percentage, *esp_color);
-                                    draw.add_rect(
-                                        [bar_x, vmax.y - 1.0],
-                                        [vmin.x, (vmax.y + 1.0) - filled_height],
-                                        health_color,
-                                    )
-                                    .filled(true)
-                                    .build();
-                                }
+                            
+                                draw.add_rect(
+                                    [bar_x, bar_y],
+                                    [bar_x + bar_width - HEALTH_BAR_BORDER_WIDTH, bar_y + bar_height - HEALTH_BAR_BORDER_WIDTH],
+                                    [0.0, 0.0, 0.0, esp_color[3]],
+                                ).thickness(HEALTH_BAR_BORDER_WIDTH).build();
                             }
                         }
                     }
@@ -418,7 +414,7 @@ impl Enhancement for PlayerESP {
                 }
             }
 
-            if settings.esp_info_health || settings.esp_info_weapon {
+            if settings.esp_info_weapon {
                 if let Some(pos) = view.world_to_screen(&entry.position, false) {
                     let entry_height = entry.calculate_screen_height(view).unwrap_or(100.0);
                     let target_scale = entry_height * 15.0 / view.screen_bounds.y;
@@ -426,7 +422,7 @@ impl Enhancement for PlayerESP {
                     ui.set_window_font_scale(target_scale);
 
                     let mut y_offset = 0.0;
-                    if settings.esp_info_health {
+                    {
                         let text = format!("{} HP", entry.player_health);
                         let [text_width, _] = ui.calc_text_size(&text);
 
@@ -436,19 +432,6 @@ impl Enhancement for PlayerESP {
                         draw.add_text(pos, esp_color.clone(), text);
 
                         y_offset += ui.text_line_height_with_spacing() * target_scale;
-                    }
-
-                    if settings.esp_info_weapon {
-                        let text = entry.weapon.display_name();
-                        let [text_width, _] = ui.calc_text_size(&text);
-
-                        let mut pos = pos.clone();
-                        pos.x -= text_width / 2.0;
-                        pos.y += y_offset;
-
-                        draw.add_text(pos, esp_color.clone(), text);
-
-                        // y_offset += ui.text_line_height_with_spacing() * target_scale;
                     }
 
                     ui.set_window_font_scale(1.0);
