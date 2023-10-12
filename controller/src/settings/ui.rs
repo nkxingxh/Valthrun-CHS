@@ -140,11 +140,22 @@ impl SettingsUI {
                                     .build(&mut settings.esp_boxes_thickness);
                             }
                             if settings.esp_box_type == EspBoxType::Box2D {
-                                ui.checkbox(obfstr!("2D 方框: 显示血量条"), &mut settings.esp_health_bar);
+                                ui.checkbox(
+                                    obfstr!("2D 方框: 显示血量条"),
+                                    &mut settings.esp_health_bar,
+                                );
                                 if settings.esp_health_bar {
                                     ui.same_line();
-                                    ui.slider("血量条尺寸", 2.0, 20.0, &mut settings.esp_health_bar_size);
-                                    ui.checkbox(obfstr!("花里胡哨血量条"), &mut settings.esp_health_bar_rainbow);
+                                    ui.slider(
+                                        "血量条尺寸",
+                                        2.0,
+                                        20.0,
+                                        &mut settings.esp_health_bar_size,
+                                    );
+                                    ui.checkbox(
+                                        obfstr!("花里胡哨血量条"),
+                                        &mut settings.esp_health_bar_rainbow,
+                                    );
                                 }
                             }
 
@@ -168,7 +179,9 @@ impl SettingsUI {
                                     LineStartPosition::BottomCenter,
                                     LineStartPosition::BottomRight,
                                 ];
-                                fn line_start_position_name(value: &LineStartPosition) -> Cow<'_, str> {
+                                fn line_start_position_name(
+                                    value: &LineStartPosition,
+                                ) -> Cow<'_, str> {
                                     match value {
                                         LineStartPosition::TopLeft => "Top Left".into(),
                                         LineStartPosition::TopCenter => "Top Center".into(),
@@ -179,9 +192,18 @@ impl SettingsUI {
                                         LineStartPosition::BottomRight => "Bottom Right".into(),
                                     }
                                 }
-                                let mut line_position_index = LINE_START_POSITIONS.iter().position(|v| *v == settings.esp_lines_position).unwrap_or_default();
-                                if ui.combo(obfstr!("Start Position"), &mut line_position_index, &LINE_START_POSITIONS, &line_start_position_name) {
-                                    settings.esp_lines_position = LINE_START_POSITIONS[line_position_index];
+                                let mut line_position_index = LINE_START_POSITIONS
+                                    .iter()
+                                    .position(|v| *v == settings.esp_lines_position)
+                                    .unwrap_or_default();
+                                if ui.combo(
+                                    obfstr!("Start Position"),
+                                    &mut line_position_index,
+                                    &LINE_START_POSITIONS,
+                                    &line_start_position_name,
+                                ) {
+                                    settings.esp_lines_position =
+                                        LINE_START_POSITIONS[line_position_index];
                                 }
                             }
 
