@@ -13,6 +13,7 @@ use crate::{
     settings::{
         AppSettings,
         EspBoxType,
+        LineStartPosition,
     },
     utils::ImGuiKey,
     Application,
@@ -153,7 +154,36 @@ impl SettingsUI {
                                     .build(&mut settings.esp_skeleton_thickness);
                             }
 
+                            ui.checkbox(obfstr!("显示工具包"), &mut settings.esp_info_kit);
                             ui.checkbox(obfstr!("显示玩家武器"), &mut settings.esp_info_weapon);
+                            ui.checkbox(obfstr!("Show lines"), &mut settings.esp_lines);
+                            if settings.esp_lines {
+                                ui.set_next_item_width(120.0);
+                                const LINE_START_POSITIONS: [LineStartPosition; 7] = [
+                                    LineStartPosition::TopLeft,
+                                    LineStartPosition::TopCenter,
+                                    LineStartPosition::TopRight,
+                                    LineStartPosition::Center,
+                                    LineStartPosition::BottomLeft,
+                                    LineStartPosition::BottomCenter,
+                                    LineStartPosition::BottomRight,
+                                ];
+                                fn line_start_position_name(value: &LineStartPosition) -> Cow<'_, str> {
+                                    match value {
+                                        LineStartPosition::TopLeft => "Top Left".into(),
+                                        LineStartPosition::TopCenter => "Top Center".into(),
+                                        LineStartPosition::TopRight => "Top Right".into(),
+                                        LineStartPosition::Center => "Center".into(),
+                                        LineStartPosition::BottomLeft => "Bottom Left".into(),
+                                        LineStartPosition::BottomCenter => "Bottom Center".into(),
+                                        LineStartPosition::BottomRight => "Bottom Right".into(),
+                                    }
+                                }
+                                let mut line_position_index = LINE_START_POSITIONS.iter().position(|v| *v == settings.esp_lines_position).unwrap_or_default();
+                                if ui.combo(obfstr!("Start Position"), &mut line_position_index, &LINE_START_POSITIONS, &line_start_position_name) {
+                                    settings.esp_lines_position = LINE_START_POSITIONS[line_position_index];
+                                }
+                            }
 
                             ui.checkbox(obfstr!("ESP 显示我方"), &mut settings.esp_enabled_team);
                             if settings.esp_enabled_team {
@@ -188,6 +218,7 @@ impl SettingsUI {
                         }
 
                         ui.checkbox(obfstr!("炸弹计时器"), &mut settings.bomb_timer);
+                        ui.checkbox(obfstr!("旁观者名单"), &mut settings.spectators_list);
                     }
 
                     if let Some(_) = ui.tab_item(obfstr!("辅助瞄准")) {
@@ -240,7 +271,7 @@ impl SettingsUI {
                             ui.separator();
                         }
 
-                        // ui.checkbox("Simle Recoil Helper", &mut settings.aim_assist_recoil);
+                        //ui.checkbox("Simle Recoil Helper", &mut settings.aim_assist_recoil);
                     }
 
                     if let Some(_) = ui.tab_item("杂项") {

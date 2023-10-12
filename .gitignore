@@ -1,4 +1,5 @@
 **/target/
 _*
 .vscode
-Cargo.lock
+.idea
+kernel/driver

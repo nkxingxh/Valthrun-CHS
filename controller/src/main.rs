@@ -69,6 +69,7 @@ use crate::{
         AntiAimPunsh,
         BombInfo,
         PlayerESP,
+        SpectatorsList,
         TriggerBot,
     },
     settings::save_app_settings,
@@ -419,8 +420,9 @@ fn main_schema_dump(args: &SchemaDumpArgs) -> anyhow::Result<()> {
 fn main_overlay() -> anyhow::Result<()> {
     let build_info = version_info()?;
     log::info!(
-        "Valthrun 版本 {}，Windows 内部版本 {}。",
+        "Valthrun 版本 {} ({})，Windows 内部版本 {}。",
         env!("CARGO_PKG_VERSION"),
+        env!("GIT_HASH"),
         build_info.dwBuildNumber
     );
 
@@ -493,6 +495,7 @@ fn main_overlay() -> anyhow::Result<()> {
 
         enhancements: vec![
             Rc::new(RefCell::new(PlayerESP::new())),
+            Rc::new(RefCell::new(SpectatorsList::new())),
             Rc::new(RefCell::new(BombInfo::new())),
             Rc::new(RefCell::new(TriggerBot::new(LocalCrosshair::new(
                 cs2_offsets.offset_crosshair_id,
