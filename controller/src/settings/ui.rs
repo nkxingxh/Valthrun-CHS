@@ -44,9 +44,9 @@ impl SettingsUI {
                 if let Some(_tab_bar) = ui.tab_bar("main") {
                     if let Some(_tab) = ui.tab_item("信息") {
                         ui.text(obfstr!(
-                            "Valthrun 是一个开源的 CS2 外部只读内核游戏增强器。"
+                            "Valthrun-CHS 是一个开源的 CS2 外部只读内核游戏增强器。"
                         ));
-                        ui.text(&format!("{} 版本 {}", obfstr!("Valthrun"), VERSION));
+                        ui.text(&format!("{} 版本 {} ({})", obfstr!("Valthrun-CHS"), VERSION, env!("GIT_HASH")));
                         ui.text(&format!(
                             "{} 版本 {} ({})",
                             obfstr!("CS2"),

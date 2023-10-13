@@ -230,15 +230,15 @@ impl Application {
             .cs2
             .reference_schema::<Globals>(&[self.cs2_offsets.globals, 0])?
             .cached()
-            .with_context(|| obfstr!("failed to read globals").to_string())?;
+            .with_context(|| obfstr!("未能读取全局数据").to_string())?;
 
         self.cs2_entities
             .read_entities()
-            .with_context(|| obfstr!("failed to read global entity list").to_string())?;
+            .with_context(|| obfstr!("无法读取全局实体列表").to_string())?;
 
         self.class_name_cache
             .update_cache(self.cs2_entities.all_identities())
-            .with_context(|| obfstr!("failed to update class name cache").to_string())?;
+            .with_context(|| obfstr!("更新类名缓存失败").to_string())?;
 
         let update_context = UpdateContext {
             cs2: &self.cs2,
@@ -410,7 +410,7 @@ fn is_console_invoked() -> bool {
 }
 
 fn main_schema_dump(args: &SchemaDumpArgs) -> anyhow::Result<()> {
-    log::info!("Dumping schema. Please wait...");
+    log::info!("正在转储模式 (schema)。请稍候...");
 
     let cs2 = CS2Handle::create()?;
     let schema = cs2::dump_schema(&cs2)?;
@@ -423,14 +423,14 @@ fn main_schema_dump(args: &SchemaDumpArgs) -> anyhow::Result<()> {
 
     let mut output = BufWriter::new(output);
     serde_json::to_writer_pretty(&mut output, &schema)?;
-    log::info!("Schema dumped to {}", args.target_file.to_string_lossy());
+    log::info!("模式已转储到 {}", args.target_file.to_string_lossy());
     Ok(())
 }
 
 fn main_overlay() -> anyhow::Result<()> {
     let build_info = version_info()?;
     log::info!(
-        "Valthrun 版本 {} ({})，Windows 内部版本 {}。",
+        "Valthrun-CHS 版本 {} ({})，Windows 内部版本 {}。",
         env!("CARGO_PKG_VERSION"),
         env!("GIT_HASH"),
         build_info.dwBuildNumber
@@ -477,10 +477,10 @@ fn main_overlay() -> anyhow::Result<()> {
     let imgui_settings = settings.imgui.clone();
     let settings = Rc::new(RefCell::new(settings));
 
-    log::debug!("Initialize overlay");
+    log::debug!("初始化叠加层");
     let app_fonts: Rc<RefCell<Option<AppFonts>>> = Default::default();
     let overlay_options = OverlayOptions {
-        title: obfstr!("CS2 Overlay").to_string(),
+        title: obfstr!("C2OL").to_string(),
         target: OverlayTarget::WindowOfProcess(cs2.module_info.process_id as u32),
         font_init: Some(Box::new({
             let app_fonts = app_fonts.clone();
@@ -512,12 +512,12 @@ fn main_overlay() -> anyhow::Result<()> {
             match &source {
                 libloading::Error::LoadLibraryExW { .. } => {
                     let error = source.source().context("LoadLibraryExW to have a source")?;
-                    let message = format!("Failed to load vulkan-1.dll.\nError: {:#}", error);
+                    let message = format!("加载 vulkan-1.dll 失败。\n错误: {:#}", error);
                     show_critical_error(&message);
                 }
                 error => {
                     let message = format!(
-                        "An error occurred while loading vulkan-1.dll.\nError: {:#}",
+                        "加载 vulkan-1.dll 时发生错误。\n错误: {:#}",
                         error
                     );
                     show_critical_error(&message);
@@ -535,7 +535,7 @@ fn main_overlay() -> anyhow::Result<()> {
         fonts: app_fonts
             .borrow_mut()
             .take()
-            .context("failed to initialize app fonts")?,
+            .context("初始化应用程序字体失败")?,
 
         cs2: cs2.clone(),
         cs2_entities: EntitySystem::new(cs2.clone(), cs2_offsets.clone()),

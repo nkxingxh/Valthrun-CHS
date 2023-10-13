@@ -11,13 +11,13 @@ pub enum KInterfaceError {
     #[error("内核接口不可用: {0}")]
     DeviceUnavailable(windows::core::Error),
 
-    #[error("request failed (DeviceIoControl)")]
+    #[error("请求失败 (DeviceIoControl)")]
     RequestFailed,
 
-    #[error("provided {provided} offsets but only {limit} are supported")]
+    #[error("提供了 {provided} 个偏移量，但只支持 {limit} 个")]
     TooManyOffsets { provided: usize, limit: usize },
 
-    #[error("failed to read at 0x{target_address:X} ({resolved_offset_count}/{offset_count})")]
+    #[error("在 0x{target_address:X} 处读取失败 ({resolved_offset_count}/{offset_count})")]
     InvalidAddress {
         target_address: u64,
 
@@ -28,7 +28,7 @@ pub enum KInterfaceError {
         offset_count: usize,
     },
 
-    #[error("the target process does no longer exists")]
+    #[error("目标进程已经不存在")]
     ProcessDoesNotExists,
 
     #[error("unknown data store error")]
