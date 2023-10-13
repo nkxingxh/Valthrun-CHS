@@ -34,10 +34,13 @@ impl SettingsUI {
     }
 
     pub fn render(&mut self, app: &Application, ui: &imgui::Ui) {
+        let content_font = ui.current_font().id();
+        let _title_font = ui.push_font(app.fonts.valthrun);
         ui.window(obfstr!("Valthrun-CHS"))
             .size([600.0, 300.0], Condition::FirstUseEver)
             .build(|| {
-                let mut settings = self.settings.borrow_mut();
+                let _content_font = ui.push_font(content_font);
+                let mut settings: std::cell::RefMut<'_, AppSettings> = self.settings.borrow_mut();
                 if let Some(_tab_bar) = ui.tab_bar("main") {
                     if let Some(_tab) = ui.tab_item("信息") {
                         ui.text(obfstr!(
@@ -165,9 +168,10 @@ impl SettingsUI {
                                     .build(&mut settings.esp_skeleton_thickness);
                             }
 
-                            ui.checkbox(obfstr!("显示工具包"), &mut settings.esp_info_kit);
+                            ui.checkbox(obfstr!("显示玩家生命值"), &mut settings.esp_info_health);
                             ui.checkbox(obfstr!("显示玩家武器"), &mut settings.esp_info_weapon);
-                            ui.checkbox(obfstr!("Show lines"), &mut settings.esp_lines);
+                            ui.checkbox(obfstr!("显示工具包"), &mut settings.esp_info_kit);
+                            ui.checkbox(obfstr!("显示跟踪线"), &mut settings.esp_lines);
                             if settings.esp_lines {
                                 ui.set_next_item_width(120.0);
                                 const LINE_START_POSITIONS: [LineStartPosition; 7] = [
@@ -183,13 +187,13 @@ impl SettingsUI {
                                     value: &LineStartPosition,
                                 ) -> Cow<'_, str> {
                                     match value {
-                                        LineStartPosition::TopLeft => "Top Left".into(),
-                                        LineStartPosition::TopCenter => "Top Center".into(),
-                                        LineStartPosition::TopRight => "Top Right".into(),
-                                        LineStartPosition::Center => "Center".into(),
-                                        LineStartPosition::BottomLeft => "Bottom Left".into(),
-                                        LineStartPosition::BottomCenter => "Bottom Center".into(),
-                                        LineStartPosition::BottomRight => "Bottom Right".into(),
+                                        LineStartPosition::TopLeft => "左上".into(),
+                                        LineStartPosition::TopCenter => "正上".into(),
+                                        LineStartPosition::TopRight => "右上".into(),
+                                        LineStartPosition::Center => "中心".into(),
+                                        LineStartPosition::BottomLeft => "左下".into(),
+                                        LineStartPosition::BottomCenter => "正下".into(),
+                                        LineStartPosition::BottomRight => "右下".into(),
                                     }
                                 }
                                 let mut line_position_index = LINE_START_POSITIONS
@@ -197,7 +201,7 @@ impl SettingsUI {
                                     .position(|v| *v == settings.esp_lines_position)
                                     .unwrap_or_default();
                                 if ui.combo(
-                                    obfstr!("Start Position"),
+                                    obfstr!("起始点"),
                                     &mut line_position_index,
                                     &LINE_START_POSITIONS,
                                     &line_start_position_name,

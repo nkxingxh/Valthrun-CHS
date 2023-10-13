@@ -1,4 +1,4 @@
-![Valthrun CS2 Logo](./logo.svg)
+![Valthrun CS2 Logo](./docs/_media/logo.svg)
 <p align="right">
 <a href="https://discord.gg/ecKbpAPW5T">
 <img src="https://discordapp.com/api/guilds/1135362291311849693/widget.png?style=shield">
@@ -39,14 +39,14 @@ Valthrun 提供各种外部工具，让您的游戏体验更加精彩。
   - 拆弹信息，如距离拆弹成功还有多久
   - 放置炸弹的地点
 - 自动扳机
+- Spectator info
+  - List of player currently watching you / the observer target
 - Stream proof by default
 
 要打开 Valthruns 菜单，请按 `PAUSE` 键。
 
 ## 计划开发的功能
 - Aimbot
-- Spectator info
-  - List of player currently watching you / the observer target
 - Player competitive ranks / wins
 
 # 安装
@@ -97,8 +97,8 @@ $env:RUST_LOG="trace"
 ```
 
 # Troubleshooting
-If you are having issues mapping the kernel driver or starting the controller, please take a look [here](https://github.com/WolverinDEV/Valthrun/tree/master/doc/troubleshooting):  
-https://github.com/WolverinDEV/Valthrun/tree/master/doc/troubleshooting
+If you are having issues mapping the kernel driver or starting the controller, please take a look [here](https://wiki.valth.run/#/):  
+https://wiki.valth.run/#/
   
 The issue you encounter is most likely covered. If you still have any questions or need assistance, feel free to checkout the official Valthrun Discord server ([click to join](https://discord.gg/ecKbpAPW5T)).
 
@@ -113,8 +113,8 @@ The latest Win 10 and Win 11 versions (22H2) have been tested. User feedback sug
 If you encounter an issue, please submit an issue containing your Windows version and detailing the error you encounter.  
   
 # Screenshots
-![](./img/showcase_01.png)
-![](./img/showcase_02.png)
+![](./docs/_media/showcase_01.png)
+![](./docs/_media/showcase_02.png)
 
 # Help
 You can find help on the official Valthrun Discord server:  
