@@ -1,4 +1,4 @@
-![Valthrun CS2 Logo](./docs/_media/logo.svg)
+![Valthrun CS2 Logo](./img/logo.svg)
 <p align="right">
 <a href="https://discord.gg/ecKbpAPW5T">
 <img src="https://discordapp.com/api/guilds/1135362291311849693/widget.png?style=shield">
@@ -49,15 +49,6 @@ Valthrun 提供各种外部工具，让您的游戏体验更加精彩。
 - Aimbot
 - Player competitive ranks / wins
 
-# 安装
-Valthrun 不需要安裝。 
-要运行 Valthrun，你只需要内核驱动程序 (`valthrun-driver.sys`) 和控制器 (`controller.exe`)。
-  
-这两个版本都可以从 GitHub 下载预编译版本。
-点击[这里](https://github.com/WolverinDEV/Valthrun/releases)查看所有发布版本。
-  
-Once downloaded read [How to use](#如何使用) to get started!
-
 # 如何使用
 The following steps need to be done to enable the overlay.
 1. Load the kernel driver  
@@ -107,14 +98,9 @@ The same considerations as mentioned in [this link](https://github.com/dretax/Ga
 With these precautions and some minor improvements, such as omitting the Valthrun identifier and using xor encryption for strings, the driver/overlay should avoid VAC detection. However, I must clarify that I haven't extensively studied VAC, so my conclusion is speculative. Personally, I have been using a C based driver/overlay like this with CSGO for several years without ever getting VAC banned. But be aware of overwatch!  
 With VAC live being enabled now, use this with caution. As always take the necessary precautions into consideration.
 
-# Supported Windows Versions
-All recent Windows versions should be supported as all functions / struct offsets are resolved dynamically.  
-The latest Win 10 and Win 11 versions (22H2) have been tested. User feedback suggests, Windows versions as far back as 20H2 are working.
-If you encounter an issue, please submit an issue containing your Windows version and detailing the error you encounter.  
-  
 # Screenshots
-![](./docs/_media/showcase_01.png)
-![](./docs/_media/showcase_02.png)
+![](./img/showcase_01.png)
+![](./img/showcase_02.png)
 
 # Help
 You can find help on the official Valthrun Discord server:  
