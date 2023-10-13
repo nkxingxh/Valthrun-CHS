@@ -1,17 +1,17 @@
-- [Home](README.md)
-- Getting Started
-  - [Overview](010_getting-started/010_overview.md)
-  - [Loading the driver](010_getting-started/020_driver.md)
-    - [Manual mapping via KD-Mapper](010_getting-started/010_mapping-method/010_kdmapper.md)
-    - [Manual mapping via KDU](010_getting-started/010_mapping-method/020_kdu.md)
-    - [Windows test-signing](010_getting-started/010_mapping-method/030_test-signing.md)
+- [主页](README.md)
+- 入门
+  - [概述](010_getting-started/010_overview.md)
+  - [加载驱动程序](010_getting-started/020_driver.md)
+    - [通过 KD-Mapper 手动映射](010_getting-started/010_mapping-method/010_kdmapper.md)
+    - [通过 KDU 手动映射](010_getting-started/010_mapping-method/020_kdu.md)
+    - [Windows 测试签名](010_getting-started/010_mapping-method/030_test-signing.md)
     - [Manual mapping via other mappers](010_getting-started/010_mapping-method/040_other-mappers.md)
-  - [Starting the overlay](010_getting-started/030_controller.md)
-- Contributing
-  - [Adding Wiki contents](020_contributing/wiki.md)
-  - [Building from source](020_contributing/build.md)
-  - [Offsets](020_contributing/offsets.md)
-- Troubleshooting
+  - [启动控制器](010_getting-started/030_controller.md)
+- 贡献
+  - [添加指南内容](020_contributing/wiki.md)
+  - [从源代码构建](020_contributing/build.md)
+  - [偏移量](020_contributing/offsets.md)
+- 疑难解答
   - [General Information](030_troubleshooting/readme.md)
   - [Valthrun Driver](030_troubleshooting/kernel/000_readme.md)
     - [Run as administrator](030_troubleshooting/kernel/010_run_as_administrator.md)

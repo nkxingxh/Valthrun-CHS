@@ -1,41 +1,40 @@
-# How to Use Valthrun
-To use Valthrun, you will need to follow several steps to set up the required components and run the Valthrun overlay. 
-Here is a guide on how to use Valthrun:
+# 如何使用 Valthrun
+要使用 Valthrun，你需要遵循几个步骤来设置所需的组件并运行 Valthrun overlay。
+以下是使用 Valthrun 的指南：
 
-## Required Files
-Before you can use Valthrun, you must acquire two essential components:
+## 所需文件
+在使用 Valthrun 之前，您必须获得两个基本组件：
 
-1. **Kernel Driver (`vulthrun-driver.sys`)**  
-The kernel driver is the crucial part of Valthrun. 
-It supports undetected arbitrary read operations on the Counter-Strike 2 process and prevents other software like VAC from detecting these operations. 
-You can obtain the latest release of the kernel driver from the GitHub release page.  
+1. **内核驱动 (`vulthrun-driver.sys`)**  
+内核驱动程序是 Valthrun 的关键部分。
+它支持对《反恐精英 2》进程进行未检测到的任意读取操作，并防止其他软件（如 VAC）检测到这些操作。
+你可以从 GitHub 发布页面取得最新版本的核心驱动程序。
 
-2. **Valthrun Overlay (`controller.exe`)**  
-The Valthrun overlay, provided as `controller.exe`, is the user interface for Valthrun.  
-It allows you to interact with and control the Valthrun software.
+2. **控制器 (`controller.exe`)**  
+以 `controller.exe` 提供的 Valthrun 叠加层是 Valthrun 的用户界面。 
+它允许你与 Valthrun 软件交互并控制它。
 
-You can download the latest releases of both the kernel driver and the CS2 overlay from the [GitHub release page](https://github.com/Valthrun/Valthrun/releases).
-  
-## Starting the Overlay
-Once you have acquired the necessary files mentioned above, follow these steps to run the Valthrun overlay:
+您可以从以下页面下载最新版本的内核驱动程序和 CS2 叠加程序:
+ - [GitHub release page](https://github.com/Valthrun/Valthrun/releases).
 
-1. **Load the Kernel Driver (`vulthrun-driver.sys`)**  
-The kernel driver is the centerpiece of Valthrun. 
-It enables undetected arbitrary read operations on the Counter-Strike 2 process and prevents detection by other software, such as VAC.
-There are multiple ways to load the kernel driver. 
-For detailed instructions on how to load the kernel driver, refer to the documentation [here](010_getting-started/020_driver.md).
+## 启动 Valthrun
+获得上述必要文件后，请按照以下步骤以启动 Valthrun:
 
-2. **Ensure Counter-Strike 2 is Running**  
-Before starting the Valthrun overlay, make sure that Counter-Strike 2 (CS2) is running. 
-If CS2 is not already running, launch the game, as the controller will not run if CS2 is not running.
+1. **加载内核驱动 (`vulthrun-driver.sys`)**  
+加载内核驱动程序有多种方法。
+有关如何加载内核驱动程序的详细说明，请参阅[此处](010_getting-started/020_driver.md)的文档。
 
-3. **Start the Overlay (`controller.exe`)**  
-Once the kernel driver has been successfully loaded, and CS2 is up and running, 
-you can start the Valthrun overlay by running `controller.exe`. 
-If everything is set up correctly, you should see a terminal window.
+1. **确保 CS2 正在运行**  
+启动 Valthrun 叠加之前，请确保《反恐精英 2》（CS2）正在运行。
+如果 CS2 尚未运行，请启动游戏，因为如果 CS2 未运行，控制器将无法运行。
+
+1. **启动控制器 (`controller.exe`)**  
+一旦成功加载内核驱动程序，且 CS2 启动并运行后，
+你可以运行 `controller.exe`，启动 Valthrun 控制器。
+如果一切设置正确，你应该会看到一个控制台窗口。
 
 Here's an example of what the overlay's interface might look like:
 ![Screenshot of Success](../../_media/screenshot_controller_success.png)
 
-With these steps completed, you are now ready to use Valthrun and take advantage of its gameplay enhancements for Counter-Strike 2.  
-Be sure to consult the project's documentation and support resources for more detailed information on its functionality and usage.
+完成这些步骤后，您现在就可以使用 Valthrun 并利用其在《反恐精英 2》中的游戏增强功能了。 
+有关其功能和使用的更多详细信息，请务必查阅项目文档和支持资源。

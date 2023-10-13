@@ -5,53 +5,65 @@
 </a>
 </p>
 
-Valthrun is an open source external Counter-Strike 2 read only kernel-level gameplay enhancer.  
-That's a lot of descriptive words, but what does each of them mean?  
-- `Valthrun` The name of this project
-- `Open Source` This application is open source and for everyone to learn from
-- `external` We do not inject any DLLs into the target process
-- `read only` We do not write to the CS2 process in any way, therefore being impossible to detect by scanning the process memory
-- `kernel` We do not use any user level WinAPIs in order to get information from the CS2 process
-  
-This project is mainly a fun example for exploring the Windows Kernel with [Rust](https://www.rust-lang.org) and exploring the world of game enhancements :)
+Valthrun 是一个开源的 CS2 外部只读内核游戏增强器。
+Valthrun-CHS 是前者的简体中文汉化版本。
 
-# WARNING <!-- {docsify-ignore-all} --> 
-Valthrun is **not** plug 'n play.  
-Please read [How to use](#how-to-use) carefully and try troubleshooting issues on your own.  
-The goal is to achieve maximum stealth in order to avoid being detected.
-  
-# Features
-Due to Valthrun being read-only (as of now), there are limitations on what features are possible to implement (eg. skin changer).
-Regardless of this limitation, Valthrun supports the following features:  
+这是什么意思？  
+- `Valthrun` 项目名称。
+- `开源` 这个应用程序是开放源代码的，供所有人学习。
+- `外部` 我们不向目标进程注入任何 DLL。
+- `CS2` 我们要增强的游戏。
+- `只读` 我们不会以任何方式写入 CS2 进程，因此无法通过扫描进程内存来检测。
+- `内核` 我们不使用任何用户级 WinAPI 从 CS2 进程获取信息。
 
-- Player ESP
-  Two modes are supported: `Skeleton` and `Boxes`
-  - Configurable colors to distinguish between enemy and team players
-  - ESP includes player health
-- Bomb Info
-  - Time until the bomb detonation
-  - Defuser info such as a defuse timer
-  - Bomb site where the bomb is located
-- Trigger Bot
+该项目主要是利用 [Rust](https://www.rust-lang.org) 探索 Windows 内核和游戏增强功能的一个有趣示例 :)
+
+# 警告 <!-- {docsify-ignore-all} --> 
+Valthrun 目前**不是** pnp (即插即用) 应用程序。 
+请仔细阅读 [如何使用](#如何使用)，并尝试自行排除故障。 
+目的是最大限度地避免反作弊检测。
+
+🔴 如果你担心***使用本工具后触发反作弊机制从而导致账号受到处罚***，我们建议你**不要使用**本工具。
+
+⚠️ **使用本工具造成的一切后果由用户自行承担。** ⚠️
+  
+# 特性
+Valthrun 提供各种外部工具，让您的游戏体验更加精彩。 
+目前，Valthrun 只读取内存，从不写入任何内容。这意味着可提供的功能有一些限制。 
+*例如，如果不主动修改 CS2 游戏状态 (如写入内存) ，就不可能提供皮肤更换器。*
+  
+尽管存在这种限制，Valthrun 还是支持以下功能:  
+- 玩家 ESP
+  支持两种模式: `骨架` 和 `方框`
+  - 可配置颜色以区分敌我玩家
+  - ESP 包括玩家生命值
+- 炸弹信息
+  - 炸弹倒计时
+  - 拆弹信息，如距离拆弹成功还有多久
+  - 放置炸弹的地点
+- 自动扳机
+- 旁观者信息
+  - 列出**正在观察你**或**与你一起旁观他人**的玩家
 - Stream proof by default
 
-To access Valthruns settings overlay press `PAUSE`.
+要打开 Valthruns 菜单，请按 `PAUSE` 键。
 
-## Planned Features
+## 计划开发的功能
 - Aimbot
-- Spectator info
-  - List of player currently watching you / the observer target
 - Player competitive ranks / wins
 
 # VAC
-The same considerations as mentioned in [this link](https://github.com/dretax/GarHal_CSGO#starting-driver) have been taken into account.  
-With these precautions and some minor improvements, such as omitting the Valthrun identifier and using xor encryption for strings, the driver/overlay should avoid VAC detection. However, I must clarify that I haven't extensively studied VAC, so my conclusion is speculative. Personally, I have been using a C based driver/overlay like this with CSGO for several years without ever getting VAC banned. But be aware of overwatch!  
-With VAC live being enabled now, use this with caution. As always take the necessary precautions into consideration.
+我们已考虑到[这个链接](https://github.com/dretax/GarHal_CSGO#starting-driver)中提到的相同注意事项。
+有了这些预防措施和一些小的改进，例如省略 Valthrun 标识符和对字符串使用 xor 加密，驱动程序/覆盖层应该可以避免 VAC 检测。不过，我必须澄清，我没有广泛研究过 VAC，所以我的结论只是推测。就我个人而言，我在 CSGO 中使用这样基于 C 语言的驱动程序/覆盖程序已有数年，从未被 VAC 禁止过。但要注意超视距！
+随着 VAC live 的启用，请谨慎使用。一如既往地采取必要的预防措施。
 
-# Screenshots
+> **用就别怕，怕就别用。**
+> **Use it and face the consequences, or don’t and be safe.**
+
+# 截图
 ![](./_media/showcase_01.png)
 ![](./_media/showcase_02.png)
 
-# Help
-You can find help on the official Valthrun Discord server:  
+# 帮助
+您可以在官方的 Valthrun Discord 服务器上找到帮助:  
 [![Discord Shield](https://discordapp.com/api/guilds/1135362291311849693/widget.png?style=shield)](https://discord.gg/ecKbpAPW5T)

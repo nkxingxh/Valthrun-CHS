@@ -20,7 +20,7 @@ Valthrun-CHS 是前者的简体中文汉化版本。
 该项目主要是利用 [Rust](https://www.rust-lang.org) 探索 Windows 内核和游戏增强功能的一个有趣示例 :)
 
 # 警告
-Valthrun 目前**不是** pnp (即插即用) 的应用程序。 
+Valthrun 目前**不是** pnp (即插即用) 应用程序。 
 请仔细阅读 [如何使用](#如何使用)，并尝试自行排除故障。 
 目的是最大限度地避免反作弊检测。
   
@@ -39,8 +39,8 @@ Valthrun 提供各种外部工具，让您的游戏体验更加精彩。
   - 拆弹信息，如距离拆弹成功还有多久
   - 放置炸弹的地点
 - 自动扳机
-- Spectator info
-  - List of player currently watching you / the observer target
+- 旁观者信息
+  - 列出**正在观察你**或**与你一起旁观他人**的玩家
 - Stream proof by default
 
 要打开 Valthruns 菜单，请按 `PAUSE` 键。
