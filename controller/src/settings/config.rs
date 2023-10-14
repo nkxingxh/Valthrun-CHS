@@ -193,10 +193,10 @@ pub fn load_app_settings() -> anyhow::Result<AppSettings> {
     let config_path = get_settings_path()?;
     if !config_path.is_file() {
         log::info!(
-            "App config file {} does not exist.",
+            "应用程序配置文件 {} 不存在。",
             config_path.to_string_lossy()
         );
-        log::info!("Using default config.");
+        log::info!("使用默认配置。");
         let config: AppSettings =
             serde_yaml::from_str("").context("failed to parse empty config")?;
 
@@ -214,7 +214,7 @@ pub fn load_app_settings() -> anyhow::Result<AppSettings> {
     let config: AppSettings =
         serde_yaml::from_reader(&mut config).context("failed to parse app config")?;
 
-    log::info!("Loaded app config from {}", config_path.to_string_lossy());
+    log::info!("从 {} 加载应用程序配置", config_path.to_string_lossy());
     Ok(config)
 }
 
@@ -235,6 +235,6 @@ pub fn save_app_settings(settings: &AppSettings) -> anyhow::Result<()> {
 
     serde_yaml::to_writer(&mut config, settings).context("failed to serialize config")?;
 
-    log::debug!("Saved app config.");
+    log::debug!("保存应用配置。");
     Ok(())
 }
