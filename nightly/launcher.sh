@@ -265,7 +265,6 @@ if "%result%" equ "0" (
     if "!failed!" equ "0" (
         call :checkFileSha256AndPrompt "!newScriptFile!"
         @REM UTF-8 编码转为 系统编码 (GBK)
-        echo [debug] 1 && pause
         PowerShell -Command "get-content '!newScriptFile!' -encoding utf8 | set-content '%~1' -encoding Oem" && start "" cmd.exe /C "%~1" && exit
         @REM move /y "!newScriptFile!" "%~1" && start "" cmd.exe /C "%~1" && exit
     ) else (
