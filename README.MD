@@ -23,6 +23,10 @@ Valthrun-CHS 是前者的简体中文汉化版本。
 Valthrun 目前**不是** pnp (即插即用) 应用程序。 
 请仔细阅读 [如何使用](#如何使用)，并尝试自行排除故障。 
 目的是最大限度地避免反作弊检测。
+
+🔴 如果你担心**使用本工具后触发反作弊机制从而导致账号受到处罚**，我们建议你**不要使用**本工具。 🔴
+
+⚠️ **使用本工具造成的一切后果由用户自行承担。** ⚠️
   
 # 特性
 Valthrun 提供各种外部工具，让您的游戏体验更加精彩。 
@@ -50,31 +54,13 @@ Valthrun 提供各种外部工具，让您的游戏体验更加精彩。
 - Player competitive ranks / wins
 
 # 如何使用
-The following steps need to be done to enable the overlay.
-1. Load the kernel driver  
-   The overlay requires the kernel driver for all memory reads and writes.
-   Therefore we need to load the driver before we can start the overlay. It's not strictly required to load the driver before starting CS2 but logically it makes sense to start with the driver.
-     
-   There are two common options to load the kernel driver:
-   1. Manually map the driver using a vulnerable driver
-      The Valthrun kernel driver fully supports manual driver mapping using a vulnerable driver. In order to detect the manual mapping the second driver entry argument (the registry patch) must be a nullptr.  
-      The kernel driver will automatically allocate a new driver for io communication.  
+## 使用一键脚本
+[下载脚本](https://lanzoux.com/irPef1bvi62f)，直接运行即可。
+如遇到错误或问题请参阅文档中的[疑难解答](https://wiki.valth.run/#/zh-cn/030_troubleshooting/readme)部分。
 
-      In order to manually map the Valthrun driver you can use tools like  
-      - [kdmapper](https://github.com/TheCruZ/kdmapper) (recommended)
-      - [KDU](https://github.com/hfiref0x/KDU) (unstable)
+## 手动运行
+详细步骤参考[文档](https://wiki.valth.run/#/zh-cn/)。
 
-   2. Setting Windows into test-signing mode  
-      TODO: Explain how to set Windows into test signing
-      Helpful guide: https://github.com/dretax/GarHal_CSGO#starting-driver
-   
-2. Start Counter-Strike 2  
-After loading the driver you can start Counter-Strike 2 as usual.  
-
-3. Start Overlay  
-With an open instance of Counter-Strike 2 you can start the overlay.  
-Attention: You *must* start the overlay as administrator!  
-  
 To explore all command line options of the controller, start the controller from the terminal and pass `-h` to display the command line interface:
 ```ps1
 .\controller.exe -h
@@ -87,16 +73,19 @@ $env:RUST_LOG="trace"
 .\controller.exe
 ```
 
-# Troubleshooting
-If you are having issues mapping the kernel driver or starting the controller, please take a look [here](https://wiki.valth.run/#/):  
-https://wiki.valth.run/#/
+# 疑难解答
+如果您在映射内核驱动程序或启动控制器时遇到问题，请查看[此处](https://wiki.valth.run/#/zh-cn/):  
+https://wiki.valth.run/#/zh-cn/
   
 The issue you encounter is most likely covered. If you still have any questions or need assistance, feel free to checkout the official Valthrun Discord server ([click to join](https://discord.gg/ecKbpAPW5T)).
 
 # VAC
-The same considerations as mentioned in [this link](https://github.com/dretax/GarHal_CSGO#starting-driver) have been taken into account.  
-With these precautions and some minor improvements, such as omitting the Valthrun identifier and using xor encryption for strings, the driver/overlay should avoid VAC detection. However, I must clarify that I haven't extensively studied VAC, so my conclusion is speculative. Personally, I have been using a C based driver/overlay like this with CSGO for several years without ever getting VAC banned. But be aware of overwatch!  
-With VAC live being enabled now, use this with caution. As always take the necessary precautions into consideration.
+我们已考虑到[这个链接](https://github.com/dretax/GarHal_CSGO#starting-driver)中提到的相同注意事项。
+有了这些预防措施和一些小的改进，例如省略 Valthrun 标识符和对字符串使用 xor 加密，驱动程序/覆盖层应该可以避免 VAC 检测。不过，我必须澄清，我没有广泛研究过 VAC，所以我的结论只是推测。就我个人而言，我在 CSGO 中使用这样基于 C 语言的驱动程序/覆盖程序已有数年，从未被 VAC 禁止过。但要注意超视距！
+随着 VAC live 的启用，请谨慎使用。一如既往地采取必要的预防措施。
+
+> **用就别怕，怕就别用。**
+> **Use it and face the consequences, or don’t and be safe.**
 
 # Screenshots
 ![](./img/showcase_01.png)
