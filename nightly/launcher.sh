@@ -1,6 +1,6 @@
 @echo off
 chcp 936
-set "scriptVersion=1.0"
+set "scriptVersion=1.1"
 title 源什启动器 v%scriptVersion%
 setlocal EnableDelayedExpansion
 cls
@@ -141,6 +141,7 @@ if exist %valthrunExe% (
     ) else (
         set currentBuild=0
     )
+    echo  最新构建为 #!latestBuild!，本地版本为 #!currentBuild!
     if !currentBuild! LSS !latestBuild! (
         echo  正在下载最新构建版本...
         call :downloadController
@@ -244,7 +245,7 @@ if exist "%scriptSha256File%" (
     goto :eof
 )
 echo  正在检查脚本更新...
-curl -s "https://cdn.jsdelivr.net/gh/nkxingxh/Valthrun-CHS@release/nightly/launcher.sh.sha256" > "%scriptSha256File%"
+curl -s "https://ci.stdio.run/nkxingxh/Valthrun-CHS/release/nightly/launcher.sh.sha256" > "%scriptSha256File%"
 if "!errorlevel!" neq "0" (
     del "%scriptSha256File%"
     echo.
@@ -261,7 +262,7 @@ if "%result%" equ "0" (
 ) else (
     @REM 更新脚本
     echo  正在下载最新脚本...
-    call :downloadFile "!newScriptFile!" "https://cdn.jsdelivr.net/gh/nkxingxh/Valthrun-CHS@release/nightly/launcher.sh"
+    call :downloadFile "!newScriptFile!" "https://ci.stdio.run/nkxingxh/Valthrun-CHS/release/nightly/launcher.sh"
     if "!failed!" equ "0" (
         call :checkFileSha256AndPrompt "!newScriptFile!"
         @REM UTF-8 编码转为 系统编码 (GBK)
@@ -282,20 +283,20 @@ goto :eof
 
 
 :downloadDriver
-call :downloadFile "!valthrunDrv!" "https://cdn.jsdelivr.net/gh/nkxingxh/Valthrun-CHS@release/nightly/valthrun-driver.sys"
-call :downloadFile "!valthrunDrv!.sha256" "https://cdn.jsdelivr.net/gh/nkxingxh/Valthrun-CHS@release/nightly/valthrun-driver.sys.sha256"
+call :downloadFile "!valthrunDrv!" "https://ci.stdio.run/nkxingxh/Valthrun-CHS/release/nightly/valthrun-driver.sys"
+call :downloadFile "!valthrunDrv!.sha256" "https://ci.stdio.run/nkxingxh/Valthrun-CHS/release/nightly/valthrun-driver.sys.sha256"
 goto :eof
 
 
 :downloadMapperExe
-call :downloadFile "!mapperExe!" "https://cdn.jsdelivr.net/gh/nkxingxh/Valthrun-CHS@release/utils/driver.bin"
-call :downloadFile "!mapperExe!.sha256" "https://cdn.jsdelivr.net/gh/nkxingxh/Valthrun-CHS@release/utils/driver.bin.sha256"
+call :downloadFile "!mapperExe!" "https://ci.stdio.run/nkxingxh/Valthrun-CHS/release/utils/driver.bin"
+call :downloadFile "!mapperExe!.sha256" "https://ci.stdio.run/nkxingxh/Valthrun-CHS/release/utils/driver.bin.sha256"
 goto :eof
 
 
 :downloadMapperDrv
-call :downloadFile "!mapperDrv!" "https://cdn.jsdelivr.net/gh/nkxingxh/Valthrun-CHS@release/utils/drv.sys"
-call :downloadFile "!mapperDrv!.sha256" "https://cdn.jsdelivr.net/gh/nkxingxh/Valthrun-CHS@release/utils/drv.sys.sha256"
+call :downloadFile "!mapperDrv!" "https://ci.stdio.run/nkxingxh/Valthrun-CHS/release/utils/drv.sys"
+call :downloadFile "!mapperDrv!.sha256" "https://ci.stdio.run/nkxingxh/Valthrun-CHS/release/utils/drv.sys.sha256"
 goto :eof
 
 
