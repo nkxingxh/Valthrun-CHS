@@ -58,7 +58,7 @@ define_weapons! {
     pub enum WeaponId {
         Unknown { id: 0, name: "未知", flags: WEAPON_FLAG_TYPE_KNIFE },
         Deagle { id: 1, name: "沙漠之鹰", flags: WEAPON_FLAG_TYPE_PISTOL },
-        Elite { id: 2, name: "Elite", flags: 0 },
+        Elite { id: 2, name: "双持贝瑞塔", flags: 0 },
         FiveSeven { id: 3, name: "FN57", flags: WEAPON_FLAG_TYPE_PISTOL },
         Glock { id: 4, name: "格洛克-18", flags: WEAPON_FLAG_TYPE_PISTOL },
         Ak47 { id: 7, name: "AK-47", flags: WEAPON_FLAG_TYPE_RIFLE },
