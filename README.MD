@@ -55,7 +55,7 @@ Valthrun 提供各种外部工具，让您的游戏体验更加精彩。
 
 # 如何使用
 ## 使用一键脚本
-[下载脚本](https://lanzoux.com/irPef1bvi62f)，直接运行即可。
+[下载脚本](https://nkxingxh.lanzoul.com/b08vilmab) (密码: 8zam)，直接运行即可。
 如遇到错误或问题请参阅文档中的[疑难解答](https://wiki.valth.run/#/zh-cn/030_troubleshooting/readme)部分。
 
 ## 手动运行

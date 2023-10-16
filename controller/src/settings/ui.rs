@@ -46,7 +46,13 @@ impl SettingsUI {
                         ui.text(obfstr!(
                             "Valthrun-CHS 是一个开源的 CS2 外部只读内核游戏增强器。"
                         ));
-                        ui.text(&format!("{} 版本 {} ({})", obfstr!("Valthrun-CHS"), VERSION, env!("GIT_HASH")));
+                        ui.text(&format!(
+                            "{} 版本 {} ({})",
+                            obfstr!("Valthrun-CHS"),
+                            VERSION,
+                            env!("GIT_HASH")
+                        ));
+                        ui.text(&format!("当前可执行文件于 {} 构建。", env!("BUILD_TIME")));
                         ui.text(&format!(
                             "{} 版本 {} ({})",
                             obfstr!("CS2"),

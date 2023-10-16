@@ -3,6 +3,7 @@ use std::{
     process::Command,
 };
 
+use chrono::Utc;
 use winres::WindowsResource;
 
 fn main() -> io::Result<()> {
@@ -15,7 +16,10 @@ fn main() -> io::Result<()> {
         )
         .expect("the git hash to be utf-8");
 
+        let build_time = Utc::now().to_string();
+
         println!("cargo:rustc-env=GIT_HASH={}", &git_hash[0..7]);
+        println!("cargo:rustc-env=BUILD_TIME={}", build_time);
     }
 
     {

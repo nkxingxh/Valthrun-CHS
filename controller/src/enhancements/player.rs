@@ -145,10 +145,7 @@ impl PlayerESP {
                 .context("invalid player name")?
                 .to_string()
         } else {
-            log::warn!(
-                "Handle at address {:p} has no valid controller!",
-                &controller_handle
-            );
+            log::warn!("地址为 {:p} 的句柄没有有效的控制器！", &controller_handle);
             return Ok(None);
         };
 

@@ -28,3 +28,4 @@ vmprotect = { git = "https://github.com/nkxingxh/rust-vmprotect-sdk.git" }
 
 [build-dependencies]
 winres = "0.1"
+chrono = "0.4.26"

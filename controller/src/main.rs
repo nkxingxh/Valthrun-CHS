@@ -430,11 +430,13 @@ fn main_schema_dump(args: &SchemaDumpArgs) -> anyhow::Result<()> {
 fn main_overlay() -> anyhow::Result<()> {
     let build_info = version_info()?;
     log::info!(
-        "Valthrun-CHS 版本 {} ({})，Windows 内部版本 {}。",
+        "{} 版本 {} ({})，Windows 内部版本 {}。",
+        obfstr!("Valthrun-CHS"),
         env!("CARGO_PKG_VERSION"),
         env!("GIT_HASH"),
         build_info.dwBuildNumber
     );
+    log::info!("当前可执行文件于 {} 构建。", env!("BUILD_TIME"));
 
     if unsafe { IsUserAnAdmin().as_bool() } {
         log::warn!("当前以管理员身份运行，可能会导致图形驱动程序出现故障。");
@@ -516,10 +518,7 @@ fn main_overlay() -> anyhow::Result<()> {
                     show_critical_error(&message);
                 }
                 error => {
-                    let message = format!(
-                        "加载 vulkan-1.dll 时发生错误。\n错误: {:#}",
-                        error
-                    );
+                    let message = format!("加载 vulkan-1.dll 时发生错误。\n错误: {:#}", error);
                     show_critical_error(&message);
                 }
             }
