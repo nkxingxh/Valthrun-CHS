@@ -16,7 +16,7 @@ fn main() -> io::Result<()> {
         )
         .expect("the git hash to be utf-8");
 
-        let build_time = Utc::now().to_string();
+        let build_time = Utc::now().format("%Y-%m-%d %H:%M:%S UTC").to_string();
 
         println!("cargo:rustc-env=GIT_HASH={}", &git_hash[0..7]);
         println!("cargo:rustc-env=BUILD_TIME={}", build_time);
