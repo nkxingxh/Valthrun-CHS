@@ -1,6 +1,6 @@
 @echo off
 chcp 936
-set "scriptVersion=1.1"
+set "scriptVersion=1.2"
 title 源什启动器 v%scriptVersion%
 setlocal EnableDelayedExpansion
 cls
@@ -43,21 +43,37 @@ set "valthrunDrv=driver.sys"
 set "mapperExe=mapper.exe"
 set "mapperDrv=drv.sys"
 set "buildNumTxt=nightly.txt"
+set "curlResolveTxt=curl_resolve.txt"
 
+@REM 开始
 call :stepEula
 call :stepDownload "%~f0"
 timeout /T 4
 call :stepDriver
+
+@REM 等待游戏启动与运行控制器
+:mainLoop
 timeout /T 4
 call :stepGame
-call :stepController INFO
+@REM call :stepController TRACE
+call :stepController
+if exist "keep_running" ( goto :mainLoop )
 
+@REM 卸载驱动
+color 6F
+"%mapperExe%" "%valthrunDrv%"
 color 8F
+
+@REM 结束
 echo.
 echo 按任意键退出。
 pause > nul
 goto :eof
 
+
+@REM ************
+@REM 各种函数定义
+@REM ************
 
 :stepEula
 set "acceptInput=我愿意承担使用本程序造成的一切后果"
@@ -79,8 +95,12 @@ echo                 \/\/ /--\ ^| \ ^| \^| _^|_ ^| \^| \_^|
 echo.
 echo ################################################################
 echo.
-echo  Valthrun-CHS 是一个开源软件 (GPL-2.0 许可证) 。
-echo  请在使用前阅读文档: https://wiki.valth.run/#/zh-cn/
+echo         Valthrun-CHS 是一个开源软件 (GPL-2.0 许可证) 。
+echo.
+echo  + Github :  https://github.com/nkxingxh/Valthrun-CHS/
+echo  +  文档  :  https://wiki.valth.run/#/zh-cn/
+echo.
+echo  ^> 请在使用前阅读文档与自述文件 (README.md)。
 echo.
 echo  使用本工具造成的一切后果由用户自行承担！
 echo  使用本工具造成的一切后果由用户自行承担！
@@ -105,7 +125,7 @@ if "%eulaAccepted%" neq "1" (
     timeout /T 4 /NOBREAK > nul
 ) else (
     color 9F
-    echo  你已同意过上述内容，程序将继续运行，你可随时退出！
+    echo  你已同意过上述内容，按任意键继续运行程序，你可随时退出！
     echo  删除 “answered” 文件即可撤回同意。
     echo.
     pause
@@ -115,6 +135,7 @@ goto :eof
 
 
 :stepDownload
+if exist "skip_update" ( goto :eof )
 color 6F
 cls
 echo ################################
@@ -124,6 +145,9 @@ echo.
 
 @REM 检查脚本更新
 call :updateScript "%~1"
+
+@REM 获取解析地址
+call :updateCurlResolve
 
 echo  正在获取最新构建信息...
 curl -s https://ci.stdio.run/job/Valthrun-CHS/api/json > nightly.json
@@ -145,7 +169,6 @@ if exist %valthrunExe% (
     if !currentBuild! LSS !latestBuild! (
         echo  正在下载最新构建版本...
         call :downloadController
-        call :downloadDriver
     ) else (
         echo  本地版本已是最新构建。
     )
@@ -205,8 +228,10 @@ if "%ERRORLEVEL%"=="0" (
     color 2F
     echo  CS2 正在运行。即将启动控制器...
 ) else (
-    echo  CS2 未运行。尝试自动启动...
-    start steam://run/730
+    if not exist "do_not_start_game" (
+        echo  CS2 未运行。尝试自动启动...
+        start steam://run/730
+    )
     echo  等待 CS2 启动...
 
     :waitloop
@@ -226,12 +251,14 @@ goto :eof
 :stepController
 color 07
 cls
-if not "%~1"=="" (
+if "%~1"=="" (
+    if exist "env_rust_log" (
+        set /p RUST_LOG=<"env_rust_log"
+    )
+) else (
     set RUST_LOG=%~1
 )
 %valthrunExe%
-color 6F
-"%mapperExe%" "%valthrunDrv%"
 goto :eof
 
 
@@ -276,9 +303,28 @@ if "%result%" equ "0" (
 goto :eof
 
 
+:updateCurlResolve
+@REM 指定不使用加速下载
+if exist "do_not_get_resolve" (
+    if exist "!curlResolveTxt!" (
+        del "!curlResolveTxt!"
+    )
+    goto :eof
+)
+echo  正在获取加速下载节点...
+curl -s https://ci.stdio.run/nkxingxh/Valthrun-CHS/release/nightly/curl_resolve.txt > %curlResolveTxt%
+if "%errorlevel%" neq "0" (
+    del "!curlResolveTxt!"
+    echo  获取加速下载节点失败！将使用默认节点下载文件
+)
+goto :eof
+
+
 :downloadController
 call :downloadFile "!valthrunExe!" "https://ci.stdio.run/job/Valthrun-CHS/lastSuccessfulBuild/artifact/target/release/controller.exe"
-echo %latestBuild% > %buildNumTxt%
+if "!latestBuild!" gtr "0" ( echo !latestBuild! > "!buildNumTxt!" )
+@REM 更新控制器同时更新驱动
+call :downloadDriver
 goto :eof
 
 
@@ -301,7 +347,10 @@ goto :eof
 
 
 :downloadFile
-curl -L -o "%~1.tmp" "%~2" %~3
+if exist "%curlResolveTxt%" (
+    set /p curlResolveCmd=<!curlResolveTxt!
+)
+curl -L -o "%~1.tmp" "%~2" %~3 %curlResolveCmd%
 @REM call :failedCheck "下载文件失败！"
 if "%errorlevel%" equ "0" (
     set failed=0
