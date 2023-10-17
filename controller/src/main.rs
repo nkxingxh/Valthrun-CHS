@@ -450,7 +450,7 @@ fn main_overlay() -> anyhow::Result<()> {
                 if let KInterfaceError::DeviceUnavailable(error) = &err {
                     if error.code().0 as u32 == 0x80070002 {
                         /* The system cannot find the file specified. */
-                        show_critical_error("** 请仔细阅读 **\n无法找到内核驱动程序接口。\n在启动控制器之前，请确保已成功加载或映射内核驱动程序 (valthrun-driver.sys)。请明确检查驱动程序入口状态代码，该代码应为 0x0。\n\n如需更多帮助，请查阅: \nhttps://github.com/nkxingxh/Valthrun-CHS/tree/master/doc/troubleshooting");
+                        show_critical_error("** 请仔细阅读 **\n无法找到内核驱动程序接口。\n在启动控制器之前，请确保已成功加载或映射内核驱动程序 (valthrun-driver.sys)。请明确检查驱动程序入口状态代码，该代码应为 0x0。\n\n如需更多帮助，请查阅文档中的疑难解答部分: \nhttps://wiki.valth.run/#/zh-cn/");
                         return Ok(());
                     }
                 } else if let KInterfaceError::ProcessDoesNotExists = &err {
