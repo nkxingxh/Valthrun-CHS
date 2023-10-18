@@ -260,7 +260,7 @@ impl SettingsUI {
                             &mut settings.key_trigger_bot,
                             [150.0, 0.0],
                         );
-                        if settings.hold_enable_trigger_bot || settings.key_trigger_bot.is_some() {
+                        if settings.trigger_bot_always_active || settings.key_trigger_bot.is_some() {
                             let mut values_updated = false;
 
                             ui.text(obfstr!("开火延迟: "));
