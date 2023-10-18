@@ -254,7 +254,7 @@ impl SettingsUI {
                     }
 
                     if let Some(_) = ui.tab_item(obfstr!("辅助瞄准")) {
-                        ui.checkbox(obfstr!("保持启用 自动开火"), &mut settings.hold_enable_trigger_bot);
+                        ui.checkbox(obfstr!("保持启用 自动开火"), &mut settings.trigger_bot_always_active);
                         ui.button_key_optional(
                             obfstr!("自动开火"),
                             &mut settings.key_trigger_bot,
