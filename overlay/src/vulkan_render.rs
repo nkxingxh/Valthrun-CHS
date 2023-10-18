@@ -218,7 +218,7 @@ fn create_vulkan_instance(
         None => vk::make_api_version(0, 1, 0, 0),
     };
     log::debug!(
-        "Detected vulkan version {}.{}.{}",
+        "检测到 Vulkan 版本 {}.{}.{}",
         vk::api_version_major(instance_version),
         vk::api_version_minor(instance_version),
         vk::api_version_patch(instance_version)
@@ -246,7 +246,7 @@ fn create_vulkan_instance(
         .enabled_extension_names(&extension_names)
         .enabled_layer_names(&enabled_layer_names);
 
-    log::debug!("Creating Vulkan instance");
+    log::debug!("正在创建 Vulkan 实例");
     let instance = unsafe {
         entry
             .create_instance(&instance_create_info, None)
@@ -269,7 +269,7 @@ fn create_vulkan_instance(
         .pfn_user_callback(Some(vulkan_debug_callback));
     let debug_utils = DebugUtils::new(entry, &instance);
 
-    log::debug!("Setup debug logging");
+    log::debug!("设置调试日志");
     let debug_utils_messenger =
         unsafe { debug_utils.create_debug_utils_messenger(&create_info, None)? };
 
@@ -304,7 +304,7 @@ fn create_vulkan_physical_device_and_get_graphics_and_present_qs_indices(
     let mut graphics = None;
     let mut present = None;
 
-    log::debug!("Available devices:");
+    log::debug!("可用设备:");
     for device in &devices {
         unsafe {
             let props = instance.get_physical_device_properties(*device);
@@ -382,7 +382,7 @@ fn create_vulkan_physical_device_and_get_graphics_and_present_qs_indices(
     unsafe {
         let props = instance.get_physical_device_properties(device);
         let device_name = CStr::from_ptr(props.device_name.as_ptr());
-        log::debug!("Selected physical device: {device_name:?}");
+        log::debug!("选定物理设备: {device_name:?}");
     }
 
     Ok((device, graphics.unwrap(), present.unwrap()))
@@ -394,7 +394,7 @@ fn create_vulkan_device_and_graphics_and_present_qs(
     graphics_q_index: u32,
     present_q_index: u32,
 ) -> crate::Result<(Device, vk::Queue, vk::Queue)> {
-    log::debug!("Creating vulkan device and graphics and present queues");
+    log::debug!("创建 Vulkan 设备和图形以及呈现队列");
     let queue_priorities = [1.0f32];
     let queue_create_infos = {
         let mut indices = vec![graphics_q_index, present_q_index];
@@ -434,7 +434,7 @@ fn create_vulkan_swapchain(
     Vec<vk::Image>,
     Vec<vk::ImageView>,
 )> {
-    log::debug!("Creating vulkan swapchain");
+    log::debug!("创建 Vulkan 交换链");
     // Swapchain format
     let format = {
         let formats = unsafe {
@@ -458,7 +458,7 @@ fn create_vulkan_swapchain(
                 .unwrap_or(&formats[0])
         }
     };
-    log::debug!("Swapchain format: {format:?}");
+    log::debug!("交换链格式: {format:?}");
 
     // Swapchain present mode
     let present_mode = {
@@ -476,7 +476,7 @@ fn create_vulkan_swapchain(
             vk::PresentModeKHR::FIFO
         }
     };
-    log::debug!("Swapchain present mode: {present_mode:?}");
+    log::debug!("交换链呈现模式: {present_mode:?}");
 
     let capabilities = unsafe {
         vulkan_context
@@ -499,11 +499,11 @@ fn create_vulkan_swapchain(
             vk::Extent2D { width, height }
         }
     };
-    log::debug!("Swapchain extent: {extent:?}");
+    log::debug!("交换链范围: {extent:?}");
 
     // Swapchain image count
     let image_count = capabilities.min_image_count;
-    log::debug!("Swapchain image count: {image_count:?}");
+    log::debug!("交换链图像数量: {image_count:?}");
 
     // Swapchain
     let families_indices = [
@@ -570,7 +570,7 @@ fn create_vulkan_swapchain(
 }
 
 fn create_vulkan_render_pass(device: &Device, format: vk::Format) -> Result<vk::RenderPass> {
-    log::debug!("Creating vulkan render pass");
+    log::debug!("创建 Vulkan 渲染传递");
     let attachment_descs = [vk::AttachmentDescription::builder()
         .format(format)
         .samples(vk::SampleCountFlags::TYPE_1)
@@ -615,7 +615,7 @@ fn create_vulkan_framebuffers(
     extent: vk::Extent2D,
     image_views: &[vk::ImageView],
 ) -> Result<Vec<vk::Framebuffer>> {
-    log::debug!("Creating vulkan framebuffers");
+    log::debug!("创建 Vulkan 帧缓冲区");
     Ok(image_views
         .iter()
         .map(|view| [*view])

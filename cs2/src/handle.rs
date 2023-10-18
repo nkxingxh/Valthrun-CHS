@@ -110,8 +110,8 @@ impl CS2Handle {
         };
 
         log::debug!(
-            "成功 {}。进程 ID 为 {}",
-            obfstr!("初始化 CS2 句柄"),
+            "成功初始化 {}。进程 ID 为 {}",
+            obfstr!("CS2 句柄"),
             module_info.process_id
         );
         log::debug!(

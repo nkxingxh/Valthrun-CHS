@@ -70,12 +70,12 @@ impl CS2Model {
         if bone_count > 6000 {
             anyhow::bail!(
                 "{} ({})",
-                obfstr!("model contains too many bones"),
+                obfstr!("模型包含太多骨骼"),
                 bone_count
             );
         }
 
-        log::trace!("正在读取 {} 种骨骼...", bone_count);
+        log::trace!("正在读取 {} 块骨骼...", bone_count);
         let model_bone_flags = cs2
             .reference_schema::<Ptr<[u32]>>(
                 &[address + offsets_manual::client::CModel::BONE_FLAGS],
