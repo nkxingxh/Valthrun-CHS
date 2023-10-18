@@ -145,7 +145,17 @@ impl PlayerESP {
                 .context("invalid player name")?
                 .to_string()
         } else {
-            log::warn!("地址为 {:p} 的句柄没有有效的控制器！", &controller_handle);
+            /*
+             * This is the case for pawns which are not controllel by a player controller.
+             * An example would be the main screen player pawns.
+             *
+             * Note: We're assuming, that uncontroller player pawns are neglectable while being in a match as the do not occurr.
+             * Bots (and controller bots) always have a player pawn controller.
+             */
+            // log::warn!(
+            //     "地址为 {:p} 的句柄没有有效的控制器！",
+            //     &controller_handle
+            // );
             return Ok(None);
         };
 
