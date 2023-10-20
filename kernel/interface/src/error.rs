@@ -5,6 +5,15 @@ use valthrun_driver_shared::IO_MAX_DEREF_COUNT;
 
 #[derive(Error, Debug)]
 pub enum KInterfaceError {
+    #[error("初始化返回了无效的状态代码 ({0:X})")]
+    InitializeInvalidStatus(u32),
+
+    #[error("内核驱动版本太低 (版本: {driver_version:X})")]
+    DriverTooOld { driver_version: u32 },
+
+    #[error("内核驱动 (版本: {driver_version:X}) 比预期的更新，并且不支持请求的版本")]
+    DriverTooNew { driver_version: u32 },
+
     #[error("内核接口路径包含无效字符")]
     DeviceInvalidPath(NulError),
 
@@ -30,6 +39,9 @@ pub enum KInterfaceError {
 
     #[error("目标进程已经不存在")]
     ProcessDoesNotExists,
+
+    #[error("the requested memory access mode is unavailable")]
+    AccessModeUnavailable,
 
     #[error("unknown data store error")]
     Unknown,

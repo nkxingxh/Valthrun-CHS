@@ -1528,6 +1528,7 @@ name = "valthrun-kernel-interface"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "env_logger",
  "log",
  "thiserror",
  "valthrun-driver-shared",
