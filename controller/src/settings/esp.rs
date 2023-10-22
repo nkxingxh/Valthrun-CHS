@@ -379,19 +379,19 @@ impl EspSelector {
         match self {
             EspSelector::None => "None".to_string(),
 
-            EspSelector::Player => "Player".to_string(),
+            EspSelector::Player => "玩家".to_string(),
             EspSelector::PlayerTeam { enemy } => {
                 if *enemy {
-                    "Enemy".to_string()
+                    "敌人".to_string()
                 } else {
-                    "Friendly".to_string()
+                    "友军".to_string()
                 }
             }
             EspSelector::PlayerTeamVisibility { visible, .. } => {
                 if *visible {
-                    "Visible".to_string()
+                    "可见的".to_string()
                 } else {
-                    "Occluded".to_string()
+                    "被遮挡的".to_string()
                 }
             }
 
@@ -407,35 +407,31 @@ impl EspSelector {
         match self {
             EspSelector::None => obfstr!("ESP Configuration").to_string(),
 
-            EspSelector::Player => obfstr!("Enabled ESP for all players").to_string(),
+            EspSelector::Player => obfstr!("对所有玩家启用 ESP").to_string(),
             EspSelector::PlayerTeam { enemy } => format!(
-                "{} {} players",
-                obfstr!("Enabled ESP for"),
-                if *enemy { "enemy" } else { "friendly" }
+                "对{}{}",
+                if *enemy { "敌人" } else { "友军" },
+                obfstr!("启用 ESP")
             ),
             EspSelector::PlayerTeamVisibility { enemy, visible } => format!(
-                "{} {} {} players",
-                obfstr!("Enabled ESP for"),
-                if *visible { "visible" } else { "occluded" },
-                if *enemy { "enemy" } else { "friendly" }
+                "对{}的{}{}",
+                if *visible { "可见" } else { "被遮挡" },
+                if *enemy { "敌人" } else { "友军" },
+                obfstr!("启用 ESP")
             ),
 
-            EspSelector::Chicken => obfstr!("Enabled ESP for chickens").to_string(),
+            EspSelector::Chicken => obfstr!("对鸡启用 ESP").to_string(),
 
-            EspSelector::Weapon => obfstr!("Enabled ESP for all weapons").to_string(),
+            EspSelector::Weapon => obfstr!("对所有武器启用 ESP").to_string(),
             EspSelector::WeaponGroup { group } => {
                 format!(
-                    "{} {}",
-                    obfstr!("Enabled ESP for"),
-                    group.display_name().to_lowercase()
+                    "对 {} {}",
+                    group.display_name().to_lowercase(),
+                    obfstr!("启用 ESP")
                 )
             }
             EspSelector::WeaponSingle { target, .. } => {
-                format!(
-                    "{} {}",
-                    obfstr!("Enabled ESP for weapon"),
-                    target.display_name()
-                )
+                format!("对 {} {}", target.display_name(), obfstr!("启用 ESP"))
             }
         }
     }

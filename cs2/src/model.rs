@@ -68,11 +68,7 @@ impl CS2Model {
             + offsets_manual::client::CModel::BONE_NAME
             - 0x08])? as usize;
         if bone_count > 6000 {
-            anyhow::bail!(
-                "{} ({})",
-                obfstr!("模型包含太多骨骼"),
-                bone_count
-            );
+            anyhow::bail!("{} ({})", obfstr!("模型包含太多骨骼"), bone_count);
         }
 
         log::trace!("正在读取 {} 块骨骼...", bone_count);

@@ -462,7 +462,10 @@ fn main_overlay() -> anyhow::Result<()> {
     );
 
     if unsafe { IsUserAnAdmin().as_bool() } {
-        log::warn!("{}", obfstr!("当前以管理员身份运行，可能会导致图形驱动程序出现故障。"));
+        log::warn!(
+            "{}",
+            obfstr!("当前以管理员身份运行，可能会导致图形驱动程序出现故障。")
+        );
     }
 
     let settings = load_app_settings()?;
@@ -477,7 +480,9 @@ fn main_overlay() -> anyhow::Result<()> {
                         return Ok(());
                     }
                 } else if let KInterfaceError::ProcessDoesNotExists = &err {
-                    show_critical_error(obfstr!("无法找到游戏进程。\n请在启动本程序前先启动游戏！"));
+                    show_critical_error(obfstr!(
+                        "无法找到游戏进程。\n请在启动本程序前先启动游戏！"
+                    ));
                     return Ok(());
                 }
             }
@@ -488,8 +493,7 @@ fn main_overlay() -> anyhow::Result<()> {
     cs2.add_metrics_record(obfstr!("controller-status"), "initializing");
 
     let cs2_build_info = BuildInfo::read_build_info(&cs2).with_context(|| {
-        obfstr!("加载 CS2 构建信息失败。CS2 版本可能高于或低于预期")
-            .to_string()
+        obfstr!("加载 CS2 构建信息失败。CS2 版本可能高于或低于预期").to_string()
     })?;
     log::info!(
         "已找到 {} 修订版本 {} 来自 {}.",
