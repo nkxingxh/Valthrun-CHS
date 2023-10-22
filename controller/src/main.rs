@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+#![feature(const_fn_floating_point_arithmetic)]
 
 use std::{
     cell::{
@@ -61,21 +62,11 @@ use settings::{
     AppSettings,
     SettingsUI,
 };
-use valthrun_kernel_interface::{
-    KInterfaceError,
-    KeyboardState,
-};
+use valthrun_kernel_interface::KInterfaceError;
 use view::ViewController;
 use windows::Win32::{
     System::Console::GetConsoleProcessList,
-    UI::{
-        Input::KeyboardAndMouse::{
-            GetAsyncKeyState,
-            VK_MBUTTON,
-            VK_XBUTTON2,
-        },
-        Shell::IsUserAnAdmin,
-    },
+    UI::Shell::IsUserAnAdmin,
 };
 
 use crate::{
@@ -99,6 +90,16 @@ mod utils;
 mod view;
 mod weapon;
 mod winver;
+
+pub trait MetricsClient {
+    fn add_metrics_record(&self, record_type: &str, record_payload: &str);
+}
+
+impl MetricsClient for CS2Handle {
+    fn add_metrics_record(&self, record_type: &str, record_payload: &str) {
+        self.add_metrics_record(record_type, record_payload)
+    }
+}
 
 pub trait KeyboardInput {
     fn is_key_down(&self, key: imgui::Key) -> bool;
@@ -177,6 +178,11 @@ impl Application {
             self.settings_dirty = false;
             let mut settings = self.settings.borrow_mut();
 
+            settings.imgui = None;
+            if let Ok(value) = serde_json::to_string(&*settings) {
+                self.cs2.add_metrics_record("settings-updated", &value);
+            }
+
             let mut imgui_settings = String::new();
             controller.imgui.save_ini_settings(&mut imgui_settings);
             settings.imgui = Some(imgui_settings);
@@ -224,6 +230,10 @@ impl Application {
         if ui.is_key_pressed_no_repeat(settings.key_settings.0) {
             log::debug!("Toogle settings");
             self.settings_visible = !self.settings_visible;
+            self.cs2.add_metrics_record(
+                "settings-toggled",
+                &format!("visible: {}", self.settings_visible),
+            );
 
             if !self.settings_visible {
                 /* overlay has just been closed */
@@ -377,7 +387,6 @@ fn main() {
     let result = match command {
         AppCommand::DumpSchema(args) => main_schema_dump(args),
         AppCommand::Overlay => main_overlay(),
-        AppCommand::BHop => main_bhop(),
     };
 
     if let Err(error) = result {
@@ -401,8 +410,6 @@ enum AppCommand {
     /// Start the overlay
     Overlay,
 
-    BHop,
-
     /// Create a schema dump
     DumpSchema(SchemaDumpArgs),
 }
@@ -424,7 +431,7 @@ fn is_console_invoked() -> bool {
 fn main_schema_dump(args: &SchemaDumpArgs) -> anyhow::Result<()> {
     log::info!("正在转储模式 (schema)。请稍候...");
 
-    let cs2 = CS2Handle::create()?;
+    let cs2 = CS2Handle::create(true)?;
     let schema = cs2::dump_schema(&cs2)?;
 
     let output = File::options()
@@ -439,10 +446,6 @@ fn main_schema_dump(args: &SchemaDumpArgs) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn main_bhop() -> anyhow::Result<()> {
-    Ok(())
-}
-
 fn main_overlay() -> anyhow::Result<()> {
     let build_info = version_info()?;
     log::info!(
@@ -452,25 +455,29 @@ fn main_overlay() -> anyhow::Result<()> {
         env!("GIT_HASH"),
         build_info.dwBuildNumber
     );
-    log::info!("当前可执行文件于 {} 构建。", env!("BUILD_TIME"));
+    log::info!(
+        "{} {} 构建。",
+        obfstr!("当前可执行文件于"),
+        env!("BUILD_TIME")
+    );
 
     if unsafe { IsUserAnAdmin().as_bool() } {
-        log::warn!("当前以管理员身份运行，可能会导致图形驱动程序出现故障。");
+        log::warn!("{}", obfstr!("当前以管理员身份运行，可能会导致图形驱动程序出现故障。"));
     }
 
     let settings = load_app_settings()?;
-    let cs2 = match CS2Handle::create() {
+    let cs2 = match CS2Handle::create(settings.metrics) {
         Ok(handle) => handle,
         Err(err) => {
             if let Some(err) = err.downcast_ref::<KInterfaceError>() {
                 if let KInterfaceError::DeviceUnavailable(error) = &err {
                     if error.code().0 as u32 == 0x80070002 {
                         /* The system cannot find the file specified. */
-                        show_critical_error("** 请仔细阅读 **\n无法找到内核驱动程序接口。\n在启动控制器之前，请确保已成功加载或映射内核驱动程序 (valthrun-driver.sys)。请明确检查驱动程序入口状态代码，该代码应为 0x0。\n\n如需更多帮助，请查阅文档中的疑难解答部分: \nhttps://wiki.valth.run/#/zh-cn/");
+                        show_critical_error(obfstr!("** 请仔细阅读 **\n无法找到内核驱动程序接口。\n在启动控制器之前，请确保已成功加载或映射内核驱动程序 (valthrun-driver.sys)。请明确检查驱动程序入口状态代码，该代码应为 0x0。\n\n如需更多帮助，请查阅文档中的疑难解答部分: \nhttps://wiki.valth.run/#/zh-cn/"));
                         return Ok(());
                     }
                 } else if let KInterfaceError::ProcessDoesNotExists = &err {
-                    show_critical_error("无法找到游戏进程。\n请在启动本程序前先启动游戏！");
+                    show_critical_error(obfstr!("无法找到游戏进程。\n请在启动本程序前先启动游戏！"));
                     return Ok(());
                 }
             }
@@ -478,8 +485,12 @@ fn main_overlay() -> anyhow::Result<()> {
             return Err(err);
         }
     };
-    let cs2_build_info = BuildInfo::read_build_info(&cs2)
-        .with_context(|| obfstr!("加载 CS2 构建信息失败。CS2 版本可能高于/低于预期").to_string())?;
+    cs2.add_metrics_record(obfstr!("controller-status"), "initializing");
+
+    let cs2_build_info = BuildInfo::read_build_info(&cs2).with_context(|| {
+        obfstr!("加载 CS2 构建信息失败。CS2 版本可能高于或低于预期")
+            .to_string()
+    })?;
     log::info!(
         "已找到 {} 修订版本 {} 来自 {}.",
         obfstr!("Counter-Strike 2"),
@@ -598,7 +609,18 @@ fn main_overlay() -> anyhow::Result<()> {
     };
     let app = Rc::new(RefCell::new(app));
 
-    log::info!("{}", obfstr!("应用程序已初始化。正在准备叠加层..."));
+    cs2.add_metrics_record(
+        obfstr!("controller-status"),
+        &format!(
+            "initialized, version: CHS-{}, git-hash: {}, win-build: {}",
+            env!("CARGO_PKG_VERSION"),
+            env!("GIT_HASH"),
+            build_info.dwBuildNumber
+        ),
+    );
+    cs2.add_metrics_record(obfstr!("cs2-version"), "initialized");
+
+    log::info!("{}", obfstr!("应用程序已初始化。正在生成叠加层..."));
     let mut update_fail_count = 0;
     let mut update_timeout: Option<(Instant, Duration)> = None;
     overlay.main_loop(
