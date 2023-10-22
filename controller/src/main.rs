@@ -486,11 +486,11 @@ fn main_overlay() -> anyhow::Result<()> {
                 } = &err
                 {
                     let message = obfstr!(
-                        "\nThe installed/loaded Valthrun driver version is too old.\nPlease ensure you installed/mapped the latest Valthrun driver.\nATTENTION: If you have manually mapped the driver, you have to restart your PC in order to load the new version."
+                        "\n已加载的 Valthrun-CHS 驱动程序版本太低。\n请确保已加载对应当前版本的驱动程序。\n注意: 如果手动映射了驱动程序，则需要先卸载驱动才能加载新版本。如果你使用的驱动映射器不支持卸载驱动，请重启计算机。"
                     ).to_string();
 
                     show_critical_error(&format!(
-                        "{}\n\nLoaded driver version: {}\nRequired driver version: {}",
+                        "{}\n\n已加载驱动版本: {}\n需要驱动版本: {}",
                         message, driver_version_string, requested_version_string
                     ));
                     return Ok(());
@@ -501,11 +501,11 @@ fn main_overlay() -> anyhow::Result<()> {
                 } = &err
                 {
                     let message = obfstr!(
-                        "\nThe installed/loaded Valthrun driver version is too new.\nPlease ensure you're using the lattest controller."
+                        "\n已加载的 Valthrun-CHS 驱动程序版本太高。\n请确保你使用了对应驱动版本的控制器。"
                     ).to_string();
 
                     show_critical_error(&format!(
-                        "{}\n\nLoaded driver version: {}\nRequired driver version: {}",
+                        "{}\n\n已加载驱动版本: {}\n需要驱动版本: {}",
                         message, driver_version_string, requested_version_string
                     ));
                     return Ok(());
