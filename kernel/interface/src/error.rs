@@ -8,11 +8,23 @@ pub enum KInterfaceError {
     #[error("初始化返回了无效的状态代码 ({0:X})")]
     InitializeInvalidStatus(u32),
 
-    #[error("内核驱动版本太低 (版本: {driver_version:X})")]
-    DriverTooOld { driver_version: u32 },
+    #[error("内核驱动版本太低 (已加载版本: {driver_version_string}, 需要版本: {requested_version_string})")]
+    DriverTooOld {
+        driver_version: u32,
+        driver_version_string: String,
 
-    #[error("内核驱动 (版本: {driver_version:X}) 比预期的更新，并且不支持请求的版本")]
-    DriverTooNew { driver_version: u32 },
+        requested_version: u32,
+        requested_version_string: String,
+    },
+
+    #[error("内核驱动 (已加载版本: {driver_version_string}) 比预期的 {requested_version_string} 更新，并且不支持请求的版本")]
+    DriverTooNew {
+        driver_version: u32,
+        driver_version_string: String,
+
+        requested_version: u32,
+        requested_version_string: String,
+    },
 
     #[error("内核接口路径包含无效字符")]
     DeviceInvalidPath(NulError),
@@ -39,6 +51,9 @@ pub enum KInterfaceError {
 
     #[error("目标进程已经不存在")]
     ProcessDoesNotExists,
+
+    #[error("could not identify process as the name is not ubiquitous")]
+    ProcessNotUbiquitous,
 
     #[error("the requested memory access mode is unavailable")]
     AccessModeUnavailable,

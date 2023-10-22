@@ -479,6 +479,36 @@ fn main_overlay() -> anyhow::Result<()> {
                         show_critical_error(obfstr!("** 请仔细阅读 **\n无法找到内核驱动程序接口。\n在启动控制器之前，请确保已成功加载或映射内核驱动程序 (valthrun-driver.sys)。请明确检查驱动程序入口状态代码，该代码应为 0x0。\n\n如需更多帮助，请查阅文档中的疑难解答部分: \nhttps://wiki.valth.run/#/zh-cn/"));
                         return Ok(());
                     }
+                } else if let KInterfaceError::DriverTooOld {
+                    driver_version_string,
+                    requested_version_string,
+                    ..
+                } = &err
+                {
+                    let message = obfstr!(
+                        "\nThe installed/loaded Valthrun driver version is too old.\nPlease ensure you installed/mapped the latest Valthrun driver.\nATTENTION: If you have manually mapped the driver, you have to restart your PC in order to load the new version."
+                    ).to_string();
+
+                    show_critical_error(&format!(
+                        "{}\n\nLoaded driver version: {}\nRequired driver version: {}",
+                        message, driver_version_string, requested_version_string
+                    ));
+                    return Ok(());
+                } else if let KInterfaceError::DriverTooNew {
+                    driver_version_string,
+                    requested_version_string,
+                    ..
+                } = &err
+                {
+                    let message = obfstr!(
+                        "\nThe installed/loaded Valthrun driver version is too new.\nPlease ensure you're using the lattest controller."
+                    ).to_string();
+
+                    show_critical_error(&format!(
+                        "{}\n\nLoaded driver version: {}\nRequired driver version: {}",
+                        message, driver_version_string, requested_version_string
+                    ));
+                    return Ok(());
                 } else if let KInterfaceError::ProcessDoesNotExists = &err {
                     show_critical_error(obfstr!(
                         "无法找到游戏进程。\n请在启动本程序前先启动游戏！"
@@ -490,6 +520,7 @@ fn main_overlay() -> anyhow::Result<()> {
             return Err(err);
         }
     };
+
     cs2.add_metrics_record(obfstr!("controller-status"), "initializing");
 
     let cs2_build_info = BuildInfo::read_build_info(&cs2).with_context(|| {
@@ -500,6 +531,10 @@ fn main_overlay() -> anyhow::Result<()> {
         obfstr!("Counter-Strike 2"),
         cs2_build_info.revision,
         cs2_build_info.build_datetime
+    );
+    cs2.add_metrics_record(
+        obfstr!("cs2-version"),
+        &format!("revision: {}", cs2_build_info.revision),
     );
 
     let cs2_offsets = Arc::new(
@@ -514,7 +549,7 @@ fn main_overlay() -> anyhow::Result<()> {
     let app_fonts: Rc<RefCell<Option<AppFonts>>> = Default::default();
     let overlay_options = OverlayOptions {
         title: obfstr!("C2OL").to_string(),
-        target: OverlayTarget::WindowOfProcess(cs2.module_info.process_id as u32),
+        target: OverlayTarget::WindowOfProcess(cs2.process_id() as u32),
         font_init: Some(Box::new({
             let app_fonts = app_fonts.clone();
 
@@ -622,7 +657,6 @@ fn main_overlay() -> anyhow::Result<()> {
             build_info.dwBuildNumber
         ),
     );
-    cs2.add_metrics_record(obfstr!("cs2-version"), "initialized");
 
     log::info!("{}", obfstr!("应用程序已初始化。正在生成叠加层..."));
     let mut update_fail_count = 0;
