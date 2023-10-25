@@ -24,8 +24,8 @@ use super::{
     EspColor,
     EspColorType,
     EspConfig,
-    EspMode,
     EspSelector,
+    KeyToggleMode,
 };
 use crate::{
     settings::{
@@ -164,31 +164,47 @@ impl SettingsUI {
                     }
 
                     if let Some(_) = ui.tab_item("热键") {
-                        ui.button_key(obfstr!("调出菜单"), &mut settings.key_settings, [150.0, 0.0]);
+                        ui.button_key(
+                            obfstr!("调出菜单"),
+                            &mut settings.key_settings,
+                            [150.0, 0.0],
+                        );
 
                         {
-                            let _enabled = ui.begin_enabled(matches!(settings.esp_mode, EspMode::Toggle | EspMode::Trigger));
-                            ui.button_key_optional(obfstr!("ESP 切换/触发"), &mut settings.esp_toogle, [ 150.0, 0.0 ]);
+                            let _enabled = ui.begin_enabled(matches!(
+                                settings.esp_mode,
+                                KeyToggleMode::Toggle | KeyToggleMode::Trigger
+                            ));
+                            ui.button_key_optional(
+                                obfstr!("ESP 切换/触发"),
+                                &mut settings.esp_toogle,
+                                [150.0, 0.0],
+                            );
                         }
                     }
 
                     if let Some(_tab) = ui.tab_item("视觉") {
                         ui.set_next_item_width(150.0);
-                        ui.combo_enum(obfstr!("ESP"), &[
-                            (EspMode::Off, "始终关闭"),
-                            (EspMode::Trigger, "触发"),
-                            (EspMode::TriggerInverted, "反向触发"),
-                            (EspMode::Toggle, "切换"),
-                            (EspMode::AlwaysOn, "保持启用"),
-                        ], &mut settings.esp_mode);
+                        ui.combo_enum(
+                            obfstr!("ESP"),
+                            &[
+                                (KeyToggleMode::Off, "始终关闭"),
+                                (KeyToggleMode::Trigger, "按住键触发"),
+                                (KeyToggleMode::TriggerInverted, "反向触发"),
+                                (KeyToggleMode::Toggle, "按键切换"),
+                                (KeyToggleMode::AlwaysOn, "保持启用"),
+                            ],
+                            &mut settings.esp_mode,
+                        );
 
                         ui.checkbox(obfstr!("炸弹计时器"), &mut settings.bomb_timer);
                         ui.checkbox(obfstr!("旁观者名单"), &mut settings.spectators_list);
                     }
 
                     if let Some(_tab) = ui.tab_item("ESP") {
-                        if settings.esp_mode == EspMode::Off {
-                            let _style = ui.push_style_color(StyleColor::Text, [ 1.0, 0.76, 0.03, 1.0 ]);
+                        if settings.esp_mode == KeyToggleMode::Off {
+                            let _style =
+                                ui.push_style_color(StyleColor::Text, [1.0, 0.76, 0.03, 1.0]);
                             ui.text("ESP 已经关闭。");
                             ui.text("请在 \"视觉\" 菜单中启用 \"ESP\"");
                         } else {
@@ -197,17 +213,30 @@ impl SettingsUI {
                     }
 
                     if let Some(_) = ui.tab_item(obfstr!("辅助瞄准")) {
-                        ui.checkbox(
-                            obfstr!("保持启用 自动开火"),
-                            &mut settings.trigger_bot_always_active,
-                        );
-                        ui.button_key_optional(
+                        ui.set_next_item_width(150.0);
+                        ui.combo_enum(
                             obfstr!("自动开火"),
-                            &mut settings.key_trigger_bot,
-                            [150.0, 0.0],
+                            &[
+                                (KeyToggleMode::Off, "始终关闭"),
+                                (KeyToggleMode::Trigger, "按住键触发"),
+                                (KeyToggleMode::TriggerInverted, "反向触发"),
+                                (KeyToggleMode::Toggle, "按键切换"),
+                                (KeyToggleMode::AlwaysOn, "保持启用"),
+                            ],
+                            &mut settings.trigger_bot_mode,
                         );
-                        if settings.trigger_bot_always_active || settings.key_trigger_bot.is_some()
-                        {
+
+                        if !matches!(
+                            settings.trigger_bot_mode,
+                            KeyToggleMode::Off | KeyToggleMode::AlwaysOn
+                        ) {
+                            ui.button_key_optional(
+                                obfstr!("自动开火热键"),
+                                &mut settings.key_trigger_bot,
+                                [150.0, 0.0],
+                            );
+                        }
+                        if !matches!(settings.trigger_bot_mode, KeyToggleMode::Off) {
                             let mut values_updated = false;
 
                             ui.text(obfstr!("开火延迟: "));
@@ -504,7 +533,8 @@ impl SettingsUI {
                 ui.checkbox(obfstr!("武器"), &mut config.info_weapon);
                 ui.checkbox(obfstr!("距离"), &mut config.info_distance);
                 ui.checkbox(obfstr!("生命值"), &mut config.info_hp_text);
-                ui.checkbox(obfstr!("工具包"), &mut config.info_kit);
+                ui.checkbox(obfstr!("工具包"), &mut config.info_flag_kit);
+                ui.checkbox(obfstr!("被闪了"), &mut config.info_flag_flashed);
             }
         }
 
@@ -630,8 +660,8 @@ impl SettingsUI {
                     ui.table_next_row();
                     Self::render_esp_settings_player_style_color(
                         ui,
-                        obfstr!("工具包文本颜色"),
-                        &mut config.info_kit_color,
+                        obfstr!("玩家标志文本颜色"),
+                        &mut config.info_flags_color,
                     );
                 }
             }
