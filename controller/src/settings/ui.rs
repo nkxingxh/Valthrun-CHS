@@ -783,7 +783,7 @@ impl SettingsUI {
         let tree_width = (content_region[0] * 0.25).max(150.0);
         let content_width = (content_region[0] - tree_width - 5.0).max(300.0);
 
-        ui.text("ESP Target");
+        ui.text("ESP 目标");
         ui.same_line_with_pos(
             original_style.window_padding[0] * 2.0 + tree_width + original_style.window_border_size,
         );
@@ -808,7 +808,7 @@ impl SettingsUI {
                 settings.esp_settings.remove(&target_key);
             }
         } else {
-            ui.text("Target Configuration");
+            ui.text("目标配置");
         };
 
         //ui.dummy([0.0, 10.0]);
