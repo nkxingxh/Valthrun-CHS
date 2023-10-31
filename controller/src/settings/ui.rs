@@ -535,6 +535,12 @@ impl SettingsUI {
                 ui.checkbox(obfstr!("生命值"), &mut config.info_hp_text);
                 ui.checkbox(obfstr!("工具包"), &mut config.info_flag_kit);
                 ui.checkbox(obfstr!("被闪了"), &mut config.info_flag_flashed);
+                ui.checkbox(obfstr!("仅显示附近玩家"), &mut config.near_players);
+                if config.near_players {
+                    ui.same_line();
+                    ui.slider_config("最大距离", 0.0, 50.0)
+                        .build(&mut config.near_players_distance);
+                }
             }
         }
 
@@ -709,6 +715,7 @@ impl SettingsUI {
                     (EspColorType::Static, "静态"),
                     (EspColorType::HealthBased, "基于生命值"),
                     (EspColorType::HealthBasedRainbow, "花里胡哨"),
+                    (EspColorType::DistanceBased, "基于距离"),
                 ],
                 &mut color_type,
             );
@@ -723,6 +730,7 @@ impl SettingsUI {
                         min: Color::from_f32([1.0, 0.0, 0.0, 1.0]),
                     },
                     EspColorType::HealthBasedRainbow => EspColor::HealthBasedRainbow,
+                    EspColorType::DistanceBased => EspColor::DistanceBased,
                 }
             }
         }
@@ -780,6 +788,7 @@ impl SettingsUI {
                         *min = Color::from_f32(min_value);
                     }
                 }
+                EspColor::DistanceBased => ui.text("Distance"),
             }
         }
     }
