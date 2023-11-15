@@ -41,6 +41,11 @@ use cs2::{
     EntitySystem,
     Globals,
 };
+use cs2_schema_generated::{
+    definition::SchemaScope,
+    RuntimeOffset,
+    RuntimeOffsetProvider,
+};
 use enhancements::Enhancement;
 use imgui::{
     Condition,
@@ -77,6 +82,7 @@ use crate::{
         SpectatorsList,
         TriggerBot,
     },
+    offsets::setup_runtime_offset_provider,
     settings::save_app_settings,
     view::LocalCrosshair,
     winver::version_info,
@@ -85,6 +91,7 @@ use crate::{
 mod cache;
 mod class_name_cache;
 mod enhancements;
+mod offsets;
 mod settings;
 mod utils;
 mod view;
@@ -432,7 +439,7 @@ fn main_schema_dump(args: &SchemaDumpArgs) -> anyhow::Result<()> {
     log::info!("正在转储模式 (schema)。请稍候...");
 
     let cs2 = CS2Handle::create(true)?;
-    let schema = cs2::dump_schema(&cs2)?;
+    let schema = cs2::dump_schema(&cs2, false)?;
 
     let output = File::options()
         .create(true)
@@ -541,6 +548,8 @@ fn main_overlay() -> anyhow::Result<()> {
         CS2Offsets::resolve_offsets(&cs2)
             .with_context(|| obfstr!("无法加载 CS2 偏移量").to_string())?,
     );
+
+    setup_runtime_offset_provider(&cs2)?;
 
     let imgui_settings = settings.imgui.clone();
     let settings = Rc::new(RefCell::new(settings));
