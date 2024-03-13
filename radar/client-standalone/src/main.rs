@@ -1,3 +1,5 @@
+use std::fs;
+
 use anyhow::Context;
 use clap::Parser;
 use cs2::{
@@ -32,6 +34,10 @@ struct Args {
     /// Use ws://127.0.0.1:7229/publish for local development.
     #[arg(short, long, default_value = "wss://radar.valth.run/publish")]
     publish_url: String,
+
+    // 一个 bool 型参数用来指示是否要将 sessionid 保存到本地
+    #[arg(short, long)]
+    session_id_write_to_file: bool,
 }
 
 async fn create_connection(
@@ -128,6 +134,10 @@ async fn main() -> anyhow::Result<()> {
 
     log::info!("Radar session {}", radar_client.session_id);
     log::info!("Available at {}", radar_url);
+
+    if (args.session_id_write_to_file) {
+        fs::write("session.txt", radar_url.as_str()).unwrap();
+    }
 
     if let Some(err) = radar_client.await {
         log::error!("Radar error: {:#}", err);
