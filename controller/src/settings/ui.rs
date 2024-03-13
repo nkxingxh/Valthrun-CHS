@@ -343,8 +343,8 @@ impl SettingsUI {
                 let mut radar = radar.lock().unwrap();
                 match radar.connection_state() {
                     WebRadarState::Connecting => {
-                        ui.text(format!("Connecting to {}", radar.endpoint()));
-                        ui.text("Please wait...");
+                        ui.text(format!("正在连接到 {}", radar.endpoint()));
+                        ui.text("请稍候...");
                     }
                     WebRadarState::Connected { session_id } => {
                         let mut radar_url = radar.endpoint().clone();
@@ -355,10 +355,10 @@ impl SettingsUI {
                             let _ = radar_url.set_scheme("http");
                         }
 
-                        ui.text(format!("You're sharing this game."));
+                        ui.text(format!("正在分享当前游戏。"));
                         {
                             let mut session_id = session_id.clone();
-                            ui.text("Session ID");
+                            ui.text("会话 ID");
 
                             ui.same_line_with_pos(100.0);
                             ui.set_next_item_width(300.0);
@@ -373,9 +373,9 @@ impl SettingsUI {
                                 .unwrap_or(false);
 
                             let copy_session_text = if show_copied {
-                                "Session id copied"
+                                "会话 ID 已复制"
                             } else {
-                                "Copy session id"
+                                "复制会话 id"
                             };
 
                             ui.same_line();
@@ -396,24 +396,21 @@ impl SettingsUI {
                                 .build();
 
                             ui.same_line();
-                            if ui.button("Open URL") {
+                            if ui.button("打开 URL") {
                                 ui.set_clipboard_text(&radar_url);
                                 utils::open_url(&radar_url);
                             }
                         }
 
                         ui.new_line();
-                        if ui.button("Stop sharing") {
+                        if ui.button("停止共享") {
                             radar.close_connection();
                             drop(radar);
                             *web_radar = None;
                         }
                     }
                     WebRadarState::Disconnected { message } => {
-                        ui.text_colored(
-                            [1.0, 0.0, 0.0, 1.0],
-                            "An error occurred sharing your game:",
-                        );
+                        ui.text_colored([1.0, 0.0, 0.0, 1.0], "共享当前游戏时发生错误:");
                         ui.text(message);
 
                         ui.new_line();
@@ -434,19 +431,19 @@ impl SettingsUI {
 
                 let url = Url::parse(&current_url);
                 ui.disabled(url.is_err(), || {
-                    if ui.button("Enable WebRadar") {
+                    if ui.button("启用 Web 雷达") {
                         let url = url.as_ref().unwrap();
                         *web_radar = Some(radar::create_web_radar(url.clone(), cs2.clone()));
                     }
                 });
 
                 ui.same_line();
-                ui.text(obfstr!("Start sharing your game"));
+                ui.text(obfstr!("开始分享当前游戏"));
                 {
                     let button_text = if settings.web_radar_advanced_settings {
-                        "Basic Settings"
+                        "基础设置"
                     } else {
-                        "Advanced Settings"
+                        "高级设置"
                     };
                     let button_text_width = ui.calc_text_size(button_text)[0];
 
@@ -458,15 +455,13 @@ impl SettingsUI {
                     }
                 }
 
-                ui.text(
-                    "The web radar is a fully detailed radar which can be visited from everywhere.",
-                );
-                ui.text("This means you can also show the radar with all the enemy info with your team mates.");
+                ui.text("Web 雷达是一个全面详细的雷达，可以从任何地方进行访问。");
+                ui.text("这意味着您还可以将包含所有敌人信息的雷达显示给您的队友。");
 
                 if settings.web_radar_advanced_settings {
                     ui.new_line();
-                    ui.text("Advanced Settings");
-                    ui.text("URL:");
+                    ui.text("高级设置");
+                    ui.text("雷达服务器:");
                     ui.same_line();
                     let _style_red_boarder =
                         ui.push_style_color(StyleColor::Border, [1.0, 0.0, 0.0, 1.0]);

@@ -14,7 +14,9 @@ use radar_client::{
 };
 use tokio::{
     sync::oneshot,
-    task::{self,},
+    task::{
+        self,
+    },
 };
 use url::Url;
 use utils_state::StateRegistry;
@@ -83,7 +85,7 @@ pub fn create_web_radar(endpoint: Url, cs2: Arc<CS2Handle>) -> Arc<Mutex<WebRada
         async move {
             let mut publisher = match WebRadar::create_connection(&endpoint, cs2).await {
                 Ok(publisher) => {
-                    log::info!("Web radar created. Session id: {}", publisher.session_id);
+                    log::info!("Web 雷达已启动。会话ID: {}", publisher.session_id);
                     let mut instance = instance.lock().unwrap();
                     instance.connection_state = WebRadarState::Connected {
                         session_id: publisher.session_id.clone(),
@@ -91,7 +93,7 @@ pub fn create_web_radar(endpoint: Url, cs2: Arc<CS2Handle>) -> Arc<Mutex<WebRada
                     publisher
                 }
                 Err(err) => {
-                    log::error!("Failed to create web radar session: {:?}", err);
+                    log::error!("无法创建 Web 雷达会话: {:?}", err);
                     let mut instance = instance.lock().unwrap();
                     instance.connection_state = WebRadarState::Disconnected {
                         message: format!("{:#}", err),
@@ -104,7 +106,7 @@ pub fn create_web_radar(endpoint: Url, cs2: Arc<CS2Handle>) -> Arc<Mutex<WebRada
                 result = &mut publisher => {
                     match result {
                         None => {
-                            log::error!("Web radar connection closed");
+                            log::error!("Web 雷达连接关闭");
 
                             let mut instance = instance.lock().unwrap();
                             instance.connection_state = WebRadarState::Disconnected {
@@ -112,7 +114,7 @@ pub fn create_web_radar(endpoint: Url, cs2: Arc<CS2Handle>) -> Arc<Mutex<WebRada
                             };
                         }
                         Some(error) => {
-                            log::error!("Web radar exited: {:#}", error);
+                            log::error!("Web 雷达已退出: {:#}", error);
 
                             let mut instance = instance.lock().unwrap();
                             instance.connection_state = WebRadarState::Disconnected {
@@ -122,7 +124,7 @@ pub fn create_web_radar(endpoint: Url, cs2: Arc<CS2Handle>) -> Arc<Mutex<WebRada
                     }
                 },
                 _ = disconnect_rx => {
-                    log::info!("Web radar closed");
+                    log::info!("Web 雷达已关闭");
 
                     let mut instance = instance.lock().unwrap();
                     instance.connection_state = WebRadarState::Disconnected {
