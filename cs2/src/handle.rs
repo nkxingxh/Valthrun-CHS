@@ -91,7 +91,7 @@ pub struct CS2Handle {
 impl CS2Handle {
     pub fn create(metrics: bool) -> anyhow::Result<Arc<Self>> {
         let interface = Box::new(IoctrlDriverInterface::create(obfstr!(
-            "\\\\.\\GLOBALROOT\\Device\\VirtDisk"
+            "\\\\.\\GLOBALROOT\\Device\\valthrun"
         ))?);
         let interface = KernelInterface::create(interface)?;
 
