@@ -121,9 +121,23 @@ impl SettingsUI {
                     if let Some(_tab) = ui.tab_item("信息") {
                         let build_info = app.app_state.resolve::<BuildInfo>(()).ok();
 
-                        ui.text(obfstr!("Valthrun-CHS 是一个开源的 CS2 外部只读内核游戏增强器。"));
-                        ui.text(&format!("{} 版本 {} ({})", obfstr!("Valthrun-CHS"), VERSION, env!("BUILD_TIME")));
-                        ui.text(&format!("{} 版本 {} ({})", obfstr!("CS2"), build_info.as_ref().map_or("error", |info| &info.revision), build_info.as_ref().map_or("error", |info| &info.build_datetime)));
+                        ui.text(obfstr!(
+                            "Valthrun-CHS 是一个开源的 CS2 外部只读内核游戏增强器。"
+                        ));
+                        ui.text(&format!(
+                            "{} 版本 {} ({})",
+                            obfstr!("Valthrun-CHS"),
+                            VERSION,
+                            env!("BUILD_TIME")
+                        ));
+                        ui.text(&format!(
+                            "{} 版本 {} ({})",
+                            obfstr!("CS2"),
+                            build_info.as_ref().map_or("error", |info| &info.revision),
+                            build_info
+                                .as_ref()
+                                .map_or("error", |info| &info.build_datetime)
+                        ));
                         ui.text(" ");
                         ui.text(obfstr!("由 NKXingXh 汉化"));
                         ui.text(&format!(

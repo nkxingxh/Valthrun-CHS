@@ -14,9 +14,7 @@ use radar_client::{
 };
 use tokio::{
     sync::oneshot,
-    task::{
-        self,
-    },
+    task::{self,},
 };
 use url::Url;
 use utils_state::StateRegistry;

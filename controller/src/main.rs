@@ -507,10 +507,7 @@ fn main_overlay() -> anyhow::Result<()> {
 
     {
         let cs2_build_info = app_state.resolve::<BuildInfo>(()).with_context(|| {
-            obfstr!(
-                "加载 CS2 构建信息失败。CS2 版本可能高于或低于预期"
-            )
-            .to_string()
+            obfstr!("加载 CS2 构建信息失败。CS2 版本可能高于或低于预期").to_string()
         })?;
 
         log::info!(
