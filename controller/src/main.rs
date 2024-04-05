@@ -11,6 +11,7 @@ use std::{
     fmt::Debug,
     fs::File,
     io::BufWriter,
+    mem,
     path::PathBuf,
     rc::Rc,
     sync::{
@@ -48,6 +49,7 @@ use imgui::{
     FontSource,
     Ui,
 };
+use libloading::Library;
 use obfstr::obfstr;
 use overlay::{
     LoadingError,
@@ -66,9 +68,20 @@ use tokio::runtime;
 use utils_state::StateRegistry;
 use valthrun_kernel_interface::KInterfaceError;
 use view::ViewController;
-use windows::Win32::{
-    System::Console::GetConsoleProcessList,
-    UI::Shell::IsUserAnAdmin,
+use windows::{
+    core::PCSTR,
+    Win32::{
+        System::{
+            ApplicationInstallationAndServicing::{
+                ActivateActCtx,
+                CreateActCtxA,
+                ACTCTXA,
+            },
+            Console::GetConsoleProcessList,
+            LibraryLoader::GetModuleHandleA,
+        },
+        UI::Shell::IsUserAnAdmin,
+    },
 };
 
 use crate::{
@@ -395,6 +408,9 @@ enum AppCommand {
 #[derive(Debug, Args)]
 struct SchemaDumpArgs {
     pub target_file: PathBuf,
+
+    #[clap(long, short, default_value_t = false)]
+    pub all_classes: bool,
 }
 
 fn is_console_invoked() -> bool {
@@ -402,7 +418,6 @@ fn is_console_invoked() -> bool {
         let mut result = [0u32; 128];
         GetConsoleProcessList(&mut result)
     };
-
     console_count > 1
 }
 
@@ -410,7 +425,7 @@ fn main_schema_dump(args: &SchemaDumpArgs) -> anyhow::Result<()> {
     log::info!("正在转储模式 (schema)。请稍候...");
 
     let cs2 = CS2Handle::create(true)?;
-    let schema = cs2::dump_schema(&cs2, false)?;
+    let schema = cs2::dump_schema(&cs2, !args.all_classes)?;
 
     let output = File::options()
         .create(true)
@@ -421,6 +436,23 @@ fn main_schema_dump(args: &SchemaDumpArgs) -> anyhow::Result<()> {
     let mut output = BufWriter::new(output);
     serde_json::to_writer_pretty(&mut output, &schema)?;
     log::info!("模式已转储到 {}", args.target_file.to_string_lossy());
+    Ok(())
+}
+
+fn preload_vulkan_with_act_ctx() -> anyhow::Result<()> {
+    unsafe {
+        let mut act_ctx = mem::zeroed::<ACTCTXA>();
+        act_ctx.cbSize = mem::size_of_val(&act_ctx) as u32;
+        act_ctx.dwFlags = 0x80 | 0x08;
+        act_ctx.hModule = GetModuleHandleA(PCSTR::null()).context("GetModuleHandleA")?;
+        act_ctx.lpResourceName = PCSTR::from_raw(1 as *const u8);
+
+        let mut cookie = 0;
+        let ctx = CreateActCtxA(&act_ctx).context("CreateActCtxA")?;
+        ActivateActCtx(ctx, &mut cookie).context("ActivateActCtx")?;
+        Library::new("vulkan-1").context("vulkan-1")?;
+    }
+
     Ok(())
 }
 
@@ -446,6 +478,10 @@ fn main_overlay() -> anyhow::Result<()> {
         );
     }
 
+    if let Err(err) = preload_vulkan_with_act_ctx() {
+        log::warn!("Act CTX preload failed: {:#}", err);
+    }
+
     let settings = load_app_settings()?;
     let cs2 = match CS2Handle::create(settings.metrics) {
         Ok(handle) => handle,
@@ -454,7 +490,7 @@ fn main_overlay() -> anyhow::Result<()> {
                 if let KInterfaceError::DeviceUnavailable(error) = &err {
                     if error.code().0 as u32 == 0x80070002 {
                         /* The system cannot find the file specified. */
-                        show_critical_error(obfstr!("** 请仔细阅读 **\n无法找到内核驱动程序接口。\n在启动控制器之前，请确保已成功加载或映射内核驱动程序 (valthrun-driver.sys)。请明确检查驱动程序入口状态代码，该代码应为 0x0。\n\n如需更多帮助，请查阅文档中的疑难解答部分: \nhttps://wiki.valth.run/#/zh-cn/"));
+                        show_critical_error(obfstr!("** 请仔细阅读 **\n无法找到内核驱动程序接口。\n在启动控制器之前，请确保已成功加载或映射内核驱动程序 (valthrun-driver.sys)。请明确检查驱动程序入口状态代码，该代码应为 0x0。\n\n如需更多帮助，请查阅文档中的疑难解答部分: \nhttps://wiki.valth.run/troubleshooting/overlay/driver_has_not_been_loaded"));
                         return Ok(());
                     }
                 } else if let KInterfaceError::DriverTooOld {

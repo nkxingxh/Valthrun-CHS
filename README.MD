@@ -53,29 +53,13 @@ Valthrun 提供各种外部工具，让您的游戏体验更加精彩。
 - Aimbot
 - Player competitive ranks / wins
 
-# 如何使用
-## 使用一键脚本
-[下载脚本](https://nkxingxh.lanzoul.com/b08vilmab) (密码: 8zam)，直接运行即可。
-如遇到错误或问题请参阅文档中的[疑难解答](https://wiki.valth.run/#/zh-cn/030_troubleshooting/readme)部分。
+# How to use / Getting started
+Please follow this guide to get started:  
+https://wiki.valth.run/getting-started/
 
-## 手动运行
-详细步骤参考[文档](https://wiki.valth.run/#/zh-cn/)。
-
-To explore all command line options of the controller, start the controller from the terminal and pass `-h` to display the command line interface:
-```ps1
-.\controller.exe -h
-```
-
-If you want a verbose output (useful for troubleshooting), start the overlay from the terminal and previously set the `RUST_LOG` environment variable.  
-Example for executing the overlay with trace output:  
-```ps1
-$env:RUST_LOG="trace"
-.\controller.exe
-```
-
-# 疑难解答
-如果您在映射内核驱动程序或启动控制器时遇到问题，请查看[此处](https://wiki.valth.run/#/zh-cn/):  
-https://wiki.valth.run/#/zh-cn/
+# Troubleshooting
+If you are having issues mapping the kernel driver or starting the controller, please take a look [here](https://wiki.valth.run/category/troubleshooting):  
+https://wiki.valth.run/category/troubleshooting
   
 The issue you encounter is most likely covered. If you still have any questions or need assistance, feel free to checkout the official Valthrun Discord server ([click to join](https://discord.gg/ecKbpAPW5T)).
 

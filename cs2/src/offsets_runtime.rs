@@ -13,6 +13,7 @@ use crate::{
     find_schema_system,
     CS2Handle,
     CSchemaSystem,
+    CSchemaTypeDeclaredClass,
     Module,
 };
 
@@ -76,15 +77,20 @@ fn load_runtime_offsets(
 
         let scope_name = scope.scope_name()?.to_string_lossy()?;
 
-        let class_bindings = scope.class_bindings()?.read_values()?;
-        log::trace!(
-            " {:X} {} with {} classes",
-            scope_ptr.address()?,
-            scope_name,
-            class_bindings.len(),
-        );
+        log::trace!("Name: {} @ {:X}", scope_name, scope_ptr.address()?);
+        let declared_classes = scope.type_declared_class()?;
+        let declared_classes = declared_classes
+            .elements()?
+            .read_entries(declared_classes.entry_count()? as usize)?;
 
-        for schema_class in class_bindings {
+        for declared_class in declared_classes {
+            let declared_class = declared_class
+                .value()?
+                .value()?
+                .cast::<CSchemaTypeDeclaredClass>()
+                .reference_schema()?;
+
+            let schema_class = declared_class.declaration()?;
             let binding = schema_class.read_schema()?;
             let schema_name = binding
                 .type_scope()?
