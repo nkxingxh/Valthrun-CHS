@@ -174,9 +174,10 @@ impl FontAtlasBuilder {
                     oversample_h: 4,
                     oversample_v: 4,
 
-                    glyph_ranges: FontGlyphRanges::from_slice(unsafe {
-                        mem::transmute(range.as_slice())
-                    }),
+                    // glyph_ranges: FontGlyphRanges::from_slice(unsafe {
+                    //     mem::transmute(range.as_slice())
+                    // }),
+                    glyph_ranges: FontGlyphRanges::chinese_full(),
 
                     ..FontConfig::default()
                 }),
