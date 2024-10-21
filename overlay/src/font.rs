@@ -256,6 +256,6 @@ fn test() {
 
     let mut collector = FontAtlasBuilder::new();
     collector
-        .register_font(include_bytes!("../resources/Roboto-Regular.ttf"))
+        .register_font(include_bytes!("../resources/SourceHanSerifCN-VF.ttf"))
         .unwrap();
 }
