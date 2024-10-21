@@ -9,6 +9,7 @@ use core::{
 
 use valthrun_driver_shared::{
     requests::{
+        self,
         ControllerInfo,
         DriverInfo,
         DriverRequest,
@@ -17,11 +18,12 @@ use valthrun_driver_shared::{
         RequestInitialize,
         RequestKeyboardState,
         RequestMouseMove,
+        RequestProcessModules,
         RequestProtectionToggle,
         RequestRead,
         RequestReportSend,
         RequestWrite,
-        ResponseCsModule,
+        ResponseProcessModules,
         ResponseRead,
         ResponseWrite,
         INIT_STATUS_CONTROLLER_OUTDATED,
@@ -31,15 +33,13 @@ use valthrun_driver_shared::{
     KeyboardState,
     ModuleInfo,
     MouseState,
+    ProcessId,
     IO_MAX_DEREF_COUNT,
     KINTERFACE_MIN_VERSION,
 };
 
 use crate::{
-    com::{
-        DriverInterface,
-        IoctrlDriverInterface,
-    },
+    com::DriverInterface,
     KInterfaceError,
     KResult,
     SearchPattern,
@@ -63,7 +63,7 @@ fn driver_version_string(driver_version: u32) -> String {
 }
 
 impl KernelInterface {
-    pub fn create(driver_interface: Box<IoctrlDriverInterface>) -> KResult<Self> {
+    pub fn create(driver_interface: Box<dyn DriverInterface>) -> KResult<Self> {
         let mut interface = Self {
             driver_interface,
             driver_version: 0,
@@ -89,7 +89,7 @@ impl KernelInterface {
                 slice::from_raw_parts(payload as *const _ as *const u8, mem::size_of_val(payload));
 
             self.driver_interface
-                .execute_request(R::control_code(), request, result)
+                .execute_request(R::function_code(), request, result)
         }?;
 
         Ok(result)
@@ -153,7 +153,7 @@ impl KernelInterface {
     }
 
     #[must_use]
-    pub fn read<T: Copy>(&self, process_id: i32, offsets: &[u64]) -> KResult<T> {
+    pub fn read<T: Copy>(&self, process_id: ProcessId, offsets: &[u64]) -> KResult<T> {
         let mut result = unsafe { std::mem::zeroed::<T>() };
         let result_buff = unsafe {
             std::slice::from_raw_parts_mut(
@@ -169,7 +169,7 @@ impl KernelInterface {
     #[must_use]
     pub fn read_slice<T: Copy>(
         &self,
-        process_id: i32,
+        process_id: ProcessId,
         offsets: &[u64],
         buffer: &mut [T],
     ) -> KResult<()> {
@@ -226,7 +226,7 @@ impl KernelInterface {
     }
 
     #[must_use]
-    pub fn write<T: Copy>(&self, process_id: i32, address: u64, value: &T) -> KResult<()> {
+    pub fn write<T: Copy>(&self, process_id: ProcessId, address: u64, value: &T) -> KResult<()> {
         let buffer = unsafe {
             std::slice::from_raw_parts(
                 std::mem::transmute::<_, *mut u8>(value),
@@ -238,7 +238,12 @@ impl KernelInterface {
     }
 
     #[must_use]
-    pub fn write_slice<T: Copy>(&self, process_id: i32, address: u64, buffer: &[T]) -> KResult<()> {
+    pub fn write_slice<T: Copy>(
+        &self,
+        process_id: ProcessId,
+        address: u64,
+        buffer: &[T],
+    ) -> KResult<()> {
         let result = unsafe {
             self.execute_request(&RequestWrite {
                 process_id,
@@ -271,7 +276,7 @@ impl KernelInterface {
     #[must_use]
     pub fn find_pattern(
         &self,
-        process_id: i32,
+        process_id: ProcessId,
         address: u64,
         length: usize,
         pattern: &dyn SearchPattern,
@@ -316,7 +321,52 @@ impl KernelInterface {
         }
     }
 
-    pub fn request_cs2_modules(&self) -> KResult<(i32, Vec<ModuleInfo>)> {
+    pub fn request_modules(&self, filter: ProcessFilter) -> KResult<(ProcessId, Vec<ModuleInfo>)> {
+        let kfilter = match filter {
+            ProcessFilter::Id { id } => requests::ProcessFilter::Id { id },
+            ProcessFilter::Name { name } => requests::ProcessFilter::Name {
+                name: name.as_ptr(),
+                name_length: name.len(),
+            },
+        };
+
+        let mut buffer = Vec::with_capacity(128);
+        buffer.resize_with(128, Default::default);
+
+        let mut retry = 0;
+        loop {
+            let response = unsafe {
+                self.execute_request(&RequestProcessModules {
+                    filter: kfilter,
+
+                    module_buffer: buffer.as_mut_ptr(),
+                    module_buffer_length: buffer.len(),
+                })?
+            };
+
+            return match response {
+                ResponseProcessModules::Success(info) => {
+                    buffer.truncate(info.module_count);
+                    Ok((info.process_id, buffer))
+                }
+                ResponseProcessModules::BufferTooSmall { expected } => {
+                    buffer.resize_with(expected, Default::default);
+                    if retry >= 3 {
+                        return Err(KInterfaceError::RequestFailed);
+                    }
+
+                    retry += 1;
+                    continue;
+                }
+                ResponseProcessModules::UbiquitousProcesses(_) => {
+                    Err(KInterfaceError::ProcessNotUbiquitous)
+                }
+                ResponseProcessModules::NoProcess => Err(KInterfaceError::ProcessDoesNotExists),
+            };
+        }
+    }
+
+    pub fn request_cs2_modules(&self) -> KResult<(ProcessId, Vec<ModuleInfo>)> {
         let mut buffer = Vec::with_capacity(128);
         buffer.resize_with(128, Default::default);
 
@@ -330,11 +380,11 @@ impl KernelInterface {
             };
 
             return match response {
-                ResponseCsModule::Success(info) => {
+                ResponseProcessModules::Success(info) => {
                     buffer.truncate(info.module_count);
                     Ok((info.process_id, buffer))
                 }
-                ResponseCsModule::BufferTooSmall { expected } => {
+                ResponseProcessModules::BufferTooSmall { expected } => {
                     buffer.resize_with(expected, Default::default);
                     if retry >= 3 {
                         return Err(KInterfaceError::RequestFailed);
@@ -343,10 +393,10 @@ impl KernelInterface {
                     retry += 1;
                     continue;
                 }
-                ResponseCsModule::UbiquitousProcesses(_) => {
+                ResponseProcessModules::UbiquitousProcesses(_) => {
                     Err(KInterfaceError::ProcessNotUbiquitous)
                 }
-                ResponseCsModule::NoProcess => Err(KInterfaceError::ProcessDoesNotExists),
+                ResponseProcessModules::NoProcess => Err(KInterfaceError::ProcessDoesNotExists),
             };
         }
     }
@@ -370,4 +420,9 @@ impl KernelInterface {
             .map(|_| ())
         }
     }
+}
+
+pub enum ProcessFilter {
+    Id { id: i32 },
+    Name { name: String },
 }

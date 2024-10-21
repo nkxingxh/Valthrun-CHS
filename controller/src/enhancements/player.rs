@@ -11,6 +11,7 @@ use cs2::{
 use cs2_schema_generated::cs2::client::C_CSPlayerPawn;
 use imgui::ImColor32;
 use obfstr::obfstr;
+use overlay::UnicodeTextRenderer;
 
 use super::Enhancement;
 use crate::{
@@ -18,6 +19,7 @@ use crate::{
         AppSettings,
         EspBoxType,
         EspConfig,
+        EspHeadDot,
         EspHealthBar,
         EspPlayerSettings,
         EspSelector,
@@ -221,12 +223,18 @@ impl Enhancement for PlayerESP {
         Ok(())
     }
 
-    fn render(&self, states: &utils_state::StateRegistry, ui: &imgui::Ui) -> anyhow::Result<()> {
+    fn render(
+        &self,
+        states: &utils_state::StateRegistry,
+        ui: &imgui::Ui,
+        unicode_text: &UnicodeTextRenderer,
+    ) -> anyhow::Result<()> {
         let settings = states.resolve::<AppSettings>(())?;
         let view = states.resolve::<ViewController>(())?;
 
         let draw = ui.get_window_draw_list();
         const UNITS_TO_METERS: f32 = 0.01905;
+        const MAX_HEAD_SIZE: f32 = 250.0;
 
         let view_world_position = match view.get_camera_world_position() {
             Some(view_world_position) => view_world_position,
@@ -287,6 +295,56 @@ impl Enhancement for PlayerESP {
                     )
                     .thickness(esp_settings.skeleton_width)
                     .build();
+                }
+            }
+
+            if esp_settings.head_dot != EspHeadDot::None {
+                if let Some(head_bone_index) = entry_model
+                    .bones
+                    .iter()
+                    .position(|bone| bone.name == "head_0")
+                {
+                    if let Some(head_state) = entry.bone_states.get(head_bone_index) {
+                        if let (Some(head_position), Some(head_far)) = (
+                            view.world_to_screen(
+                                &(head_state.position
+                                    + nalgebra::Vector3::new(0.0, 0.0, esp_settings.head_dot_z)),
+                                true,
+                            ),
+                            view.world_to_screen(
+                                &(head_state.position
+                                    + nalgebra::Vector3::new(
+                                        0.0,
+                                        0.0,
+                                        esp_settings.head_dot_z + 2.0,
+                                    )),
+                                true,
+                            ),
+                        ) {
+                            let color = esp_settings
+                                .head_dot_color
+                                .calculate_color(player_rel_health, distance);
+
+                            let radius =
+                                f32::min(f32::abs(head_position.y - head_far.y), MAX_HEAD_SIZE)
+                                    * esp_settings.head_dot_base_radius;
+
+                            let circle = draw.add_circle(head_position, radius, color);
+
+                            match esp_settings.head_dot {
+                                EspHeadDot::Filled => {
+                                    circle.filled(true).build();
+                                }
+                                EspHeadDot::NotFilled => {
+                                    circle
+                                        .filled(false)
+                                        .thickness(esp_settings.head_dot_thickness)
+                                        .build();
+                                }
+                                EspHeadDot::None => unreachable!(),
+                            }
+                        }
+                    }
                 }
             }
 
@@ -441,8 +499,12 @@ impl Enhancement for PlayerESP {
                         esp_settings
                             .info_name_color
                             .calculate_color(player_rel_health, distance),
-                        &entry.player_name,
+                        entry.player_name.as_ref().map_or("unknown", String::as_str),
                     );
+
+                    if let Some(player_name) = &entry.player_name {
+                        unicode_text.register_unicode_text(player_name);
+                    }
                 }
 
                 if esp_settings.info_weapon {

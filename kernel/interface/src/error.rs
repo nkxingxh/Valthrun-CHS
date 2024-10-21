@@ -32,6 +32,9 @@ pub enum KInterfaceError {
     #[error("内核接口不可用: {0}")]
     DeviceUnavailable(windows::core::Error),
 
+    #[error("未能加载 um 驱动程序: {0}")]
+    DriverLoadingError(#[from] libloading::Error),
+
     #[error("请求失败 (DeviceIoControl)")]
     RequestFailed,
 
